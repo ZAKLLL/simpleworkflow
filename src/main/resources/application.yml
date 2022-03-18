@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    type: com.mysql.cj.jdbc.MysqlDataSource
+    url: jdbc:mysql://127.0.0.1/zaklworkflow
+    username: root
+    password: ZJK15626933724
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+
