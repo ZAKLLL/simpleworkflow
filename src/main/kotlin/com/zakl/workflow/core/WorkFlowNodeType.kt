@@ -23,7 +23,7 @@ enum class WorkFlowNodeType {
     MULTI_USER_TASK_NODE,
 
     /**
-     *
+     *自动任务节点
      */
     EVENT_TASK_NODE,
 

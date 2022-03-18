@@ -15,17 +15,17 @@ class WorkFlowNode constructor(
     var name: String,
     var type: WorkFlowNodeType,
     var parentLineId: String,
-    var sonLineId: String,
+    var sId: String,
 )
 
 /**
  * 工作流路
  */
 class WorkFlowLine constructor(
-    var uId: String,
-    var name: String,
-    var parentNodeId: String,
-    var sonNodeIds: Array<String>,
+    var uId: String?,
+    var name: String?,
+    var pId: String?,
+    var sId: String?,
     //当父节点为排他网关时,次字段有效
     var exclusiveOrder: Int = 0,
     //如果为null
@@ -35,18 +35,19 @@ class WorkFlowLine constructor(
 class WorkFlowGateWay constructor(
     var uId: String,
     var name: String,
-    var type: GateWayType,
+    var type: GatewayType,
     /**
      * 入路id
-     * 当GateWay==SINGLE_EXCLUSIVE_GATEWAY||GateWay==SINGLE_PARALLEL_GATEWAY
-     * pid==1
      */
     var pids: Array<String>,
-    //出路id
+    /**
+     * 出路id
+     */
     var sIds: Array<String>,
-    //当父节点为排他网关时,次字段有效
-    var exclusiveOrder: Int = 0,
-    //当父节点为排他网关时,次字段有效
-    var flowConditionExpression: String?
+    /**
+     * 当type 为mutli 时
+     * 此字段有效,判断是否需要所有节点到达再进行下一步
+     */
+    var arriveAll: Boolean,
 )
 
