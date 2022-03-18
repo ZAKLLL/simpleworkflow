@@ -2,6 +2,7 @@ package com.zakl.workflow.rest
 
 import com.zakl.workflow.entity.ModelConfig
 import com.zakl.workflow.entity.ModelConfigMapper
+import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -13,6 +14,7 @@ import java.util.*
  * @date 3/18/2022 10:38 AM
  * @author ZhangJiaKui
  */
+@Api(tags = ["123"])
 @RestController
 class TestController {
 

@@ -11,11 +11,16 @@ package com.zakl.workflow.core
  * 工作流节点
  */
 class WorkFlowNode constructor(
-    var uId: String,
-    var name: String,
-    var type: WorkFlowNodeType,
-    var parentLineId: String,
-    var sId: String,
+    var uId: String?,
+    var name: String?,
+    var type: NodeType?,
+    var pid: String?,
+    var sId: String?,
+    /**
+     * 多人会签
+     * 通过表达式
+     */
+    var endExpression: String?
 )
 
 /**

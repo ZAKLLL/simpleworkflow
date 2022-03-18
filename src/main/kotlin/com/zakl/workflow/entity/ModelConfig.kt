@@ -17,7 +17,7 @@ import java.util.*
  */
 @TableName(ModelConfig.tableName)
 @AllArgsConstructor
-open class ModelConfig : BasePersistentObject() {
+class ModelConfig : BasePersistentObject() {
     companion object {
         const val tableName = "t_model_config"
     }

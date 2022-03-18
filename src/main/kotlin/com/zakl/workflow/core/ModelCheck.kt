@@ -18,12 +18,12 @@ class ModelCheck(
     /**
      * 具有 到达 end节点通路 的节点Id
      */
-    var toEndSet: Set<String> = HashSet()
+    private var toEndSet: Set<String> = HashSet()
 
     /**
      * 需要检查是否拥有是否存在不能结束的环
      */
-    var needToCheckCycles: List<Set<String>> = ArrayList();
+    private var needToCheckCycles: List<Set<String>> = ArrayList();
 
 
     /**
@@ -43,13 +43,13 @@ class ModelCheck(
         var endNode: WorkFlowNode? = null
         nodeMap.values.forEach { node ->
             run {
-                if (node.type == WorkFlowNodeType.START_NODE) {
+                if (node.type == NodeType.START_NODE) {
                     if (startNode != null) {
                         throw ModelDefileException("存在多个 开始 节点")
                     }
                     startNode = node;
                 }
-                if (node.type == WorkFlowNodeType.END_NODE) {
+                if (node.type == NodeType.END_NODE) {
                     if (endNode != null) {
                         throw ModelDefileException("存在多个 结束 节点")
                     }
@@ -66,7 +66,7 @@ class ModelCheck(
         nodeMap.values.forEach { i ->
             run {
                 if (i.uId != startNode!!.uId && i.uId != endNode!!.uId) {
-                    if (i.sId.isEmpty()) {
+                    if (StrUtil.isBlank(i.sId)) {
                         throw ModelDefileException("除 end节点之外的每个节点都应该具有 出路")
                     }
                 }
@@ -88,7 +88,10 @@ class ModelCheck(
 
     }
 
-    fun nodeCheck(node: WorkFlowNode, vis: Set<String>) {
+    /**
+     * 节点检查
+     */
+    private fun nodeCheck(node: WorkFlowNode, vis: Set<String>) {
         //如果出现环路,环路上必须出现排他网关，且此排他网关必须拥有具备通向end的路径
         if (vis.contains(node.uId)) {
             needToCheckCycles.plus(vis)
@@ -98,9 +101,9 @@ class ModelCheck(
         }
         when (node.type) {
             //end节点需要校验是否为
-            WorkFlowNodeType.END_NODE -> {
+            NodeType.END_NODE -> {
                 toEndSet.plus(vis)
-                if (node.sId.isNotEmpty()) {
+                if (StrUtil.isNotEmpty(node.sId)) {
                     throw ModelDefileException("请检查 结束节点不应包含出路!")
                 }
                 return
@@ -112,6 +115,9 @@ class ModelCheck(
     }
 
 
+    /**
+     * 连接线检查
+     */
     private fun lineCheck(line: WorkFlowLine, vis: Set<String>) {
         if (vis.contains(line.uId)) {
             needToCheckCycles.plus(vis)
@@ -131,6 +137,9 @@ class ModelCheck(
         }
     }
 
+    /**
+     * 路由检查
+     */
     private fun gateWayCheck(gateWay: WorkFlowGateWay, vis: Set<String>) {
 
         if (vis.contains(gateWay.uId)) {
@@ -159,7 +168,10 @@ class ModelCheck(
         }
     }
 
-    fun cycleCheck() {
+    /**
+     * 环路检查
+     */
+    private fun cycleCheck() {
         for (needToCheckCycle in needToCheckCycles) {
             for (nodeId in needToCheckCycle) {
                 if (toEndSet.contains(nodeId)) {

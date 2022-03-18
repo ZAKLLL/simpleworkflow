@@ -16,6 +16,9 @@
     <properties>
         <java.version>17</java.version>
         <kotlin.version>1.6.0</kotlin.version>
+        <swagger.version>2.9.2</swagger.version>
+        <swagger.model.version>1.5.22</swagger.model.version>
+        <swagger-ui.version>2.9.2</swagger-ui.version>
     </properties>
     <dependencies>
         <dependency>
@@ -98,6 +101,32 @@
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
+
+
+        <!--swagger2 自动生成文档-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger-ui.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-models</artifactId>
+            <version>${swagger.model.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>1.9.6</version>
+        </dependency>
+
 
     </dependencies>
 

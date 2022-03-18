@@ -6,7 +6,7 @@ package com.zakl.workflow.core
  * @date 3/18/2022 10:56 AM
  * @author ZhangJiaKui
  */
-enum class WorkFlowNodeType {
+enum class NodeType {
     /**
      * 开始节点
      */
