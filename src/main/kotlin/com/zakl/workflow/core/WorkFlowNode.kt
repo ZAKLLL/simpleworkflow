@@ -1,6 +1,7 @@
 package com.zakl.workflow.core
 
 import com.alibaba.fastjson.JSONObject
+import com.zakl.workflow.exception.ModelDefileException
 
 /**
  * @classname Node
@@ -9,25 +10,22 @@ import com.alibaba.fastjson.JSONObject
  * @author ZhangJiaKui
  */
 
-open class WorkFlowNode constructor(
+// 存在环路
+class WorkFlowNode constructor(
     var uId: String,
     var name: String,
     var type: WorkFlowNodeType,
     var parentLineId: String,
     var sonLineIds: Array<String>,
-    //todo 任务触发器
-) {}
+    /**
+     * 当且仅当
+     * WorkFlowNodeType== PARALLEL_END_EXCLUSIVE_GATEWAY || WorkFlowNodeType== PARALLEL_END_PARALLEL_GATEWAY
+     * 时有效
+     */
+    var pParallelIds: Array<String>
+)
 
-fun main() {
-    val workFlowNode = WorkFlowNode("123", "qwe", WorkFlowNodeType.END_NODE, "555", arrayOf("ttt"))
-    var toJSON = JSONObject.toJSON(workFlowNode)
-    print(toJSON)
-    val parseObject = JSONObject.parseObject(toJSON.toString(), WorkFlowNode::class.java)
-    print(parseObject)
-}
-
-
-open class WorkFlowLine constructor(
+class WorkFlowLine constructor(
     var uId: String,
     var name: String,
     var parentNodeId: String,
@@ -36,6 +34,4 @@ open class WorkFlowLine constructor(
     var exclusiveOrder: Int = 0,
     //如果为null
     var flowConditionExpression: String?
-) {
-
-}
+)

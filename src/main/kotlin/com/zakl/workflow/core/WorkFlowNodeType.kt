@@ -28,6 +28,16 @@ enum class WorkFlowNodeType {
     PARALLEL_GATEWAY,
 
     /**
+     * 并行网关结束_排他网关
+     */
+    PARALLEL_END_EXCLUSIVE_GATEWAY,
+
+    /**
+     * 并行网关结束_并行网关
+     */
+    PARALLEL_END_PARALLEL_GATEWAY,
+
+    /**
      * 多人任务节点(多人会签)
      */
     MULTI_USER_TASK_NODE,

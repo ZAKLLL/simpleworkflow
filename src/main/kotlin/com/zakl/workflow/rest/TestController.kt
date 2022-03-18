@@ -1,4 +1,4 @@
-package com.zakl.workflow
+package com.zakl.workflow.rest
 
 import com.zakl.workflow.entity.ModelConfig
 import com.zakl.workflow.entity.ModelConfigMapper
