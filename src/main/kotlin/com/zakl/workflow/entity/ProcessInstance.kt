@@ -6,13 +6,29 @@ import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
-import lombok.AllArgsConstructor
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
 @TableName(value = ProcessInstance.tableName)
-@AllArgsConstructor
-class ProcessInstance : BasePersistentObject() {
+data class ProcessInstance(
+
+
+    /**
+     * 模板id
+     */
+    var modelId: String,
+
+    /**
+     * identityId
+     */
+    var identityId: String,
+
+    /**
+     * 实例共享变量
+     */
+    var variables: String
+
+) : BasePersistentObject() {
     companion object {
         const val tableName = "t_processInstance"
     }
@@ -20,27 +36,11 @@ class ProcessInstance : BasePersistentObject() {
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
 
-
-    /**
-     * 模板id
-     */
-    var modelId: String? = null
-
-
-    /**
-     * identityId
-     */
-    var identityId: String? = null
-
     /**
      * 流程状态
      */
     var instanceState: Int = 0
 
-    /**
-     * 实例共享变量
-     */
-    var variables: String = "{}"
 
     /**
      * 开始时间

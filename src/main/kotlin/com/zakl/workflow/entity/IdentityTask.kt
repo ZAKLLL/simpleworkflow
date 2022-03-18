@@ -65,6 +65,10 @@ class IdentityTask : BasePersistentObject() {
      */
     var variables: String? = "{}"
 
+    /**
+     * 指定identity Id
+     */
+    var nextAssignValue: String? = null;
 
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)

@@ -8,6 +8,9 @@ import java.lang.RuntimeException
  * @date 3/18/2022 4:24 PM
  * @author ZhangJiaKui
  */
-class ModelDefileException(message: String?) : RuntimeException(message) {
+class ModelDefineException(message: String?) : RuntimeException(message) {
+}
+
+class ProcessException(message: String?) : RuntimeException(message) {
 
 }

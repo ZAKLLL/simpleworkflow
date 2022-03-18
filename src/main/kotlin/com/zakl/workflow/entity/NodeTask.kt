@@ -52,6 +52,21 @@ class NodeTask : BasePersistentObject() {
 
 
     /**
+     * 节点指定人占位符
+     */
+    var assignName: String? = null
+
+    /**
+     * 当前节点assignvalue
+     */
+    var curAssignValue: String? = null
+
+    /**
+     * 下个节点
+     */
+    var nextAssignValue: String? = null
+
+    /**
      * 实例节点共享变量
      */
     var variables: String = "{}"

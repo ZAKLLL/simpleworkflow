@@ -11,7 +11,8 @@ import java.util.*
  * @Date 2020/7/27 11:23
  * @Created by ZhangJiaKui
  */
-open class BasePersistentObject() : Serializable {
+open class BasePersistentObject : Serializable {
+
 
     @TableField(fill = FieldFill.INSERT)
     var createTime: Date = Date()
