@@ -1,6 +1,5 @@
 package com.zakl.workflow.core
 
-import cn.hutool.core.util.StrUtil
 import com.zakl.workflow.exception.ModelDefileException
 
 /**
@@ -11,7 +10,8 @@ import com.zakl.workflow.exception.ModelDefileException
  */
 class ModelCheck(
     var nodeMap: Map<String, WorkFlowNode>,
-    var lineMap: Map<String, WorkFlowLine>
+    var lineMap: Map<String, WorkFlowLine>,
+    var gateWayMap: Map<String, GateWayType>,
 ) {
 
 
@@ -44,8 +44,8 @@ class ModelCheck(
         //除根节点之外,每个节点都应该具有preLine,并且sonLine 不能为空
         nodeMap.values.forEach { i ->
             run {
-                if (!i.uId.equals(startNode!!.uId) && !i.uId.equals(endNode!!.uId)) {
-                    if (i.sonLineIds.isEmpty()) {
+                if (i.uId != startNode!!.uId && i.uId != endNode!!.uId) {
+                    if (i.sonLineId.isEmpty()) {
                         throw ModelDefileException("除 end节点之外的每个节点都应该具有 出路")
                     }
                 }
@@ -71,30 +71,33 @@ class ModelCheck(
             //end节点需要校验是否为
             WorkFlowNodeType.END_NODE -> {
                 nodeToEndSet.plus(vis)
-                if (node.sonLineIds.isNotEmpty()) {
+                if (node.sonLineId.isNotEmpty()) {
                     throw ModelDefileException("请检查 结束节点不应包含出路!")
                 }
             }
-            WorkFlowNodeType.EXCLUSIVE_GATEWAY -> {
-                //todo 排他网关的每一条出库应该具有表达式,并且表达式要符合规则,最终得到
-                for (sonLineId in node.sonLineIds) {
-                    if (StrUtil.isBlank(lineMap[sonLineId]!!.flowConditionExpression)) {
-                        throw ModelDefileException("排他网关 的 出路 应当具有条件表达式 !")
-                    }
-                }
-            }
+
 
             else -> {}
         }
-        node.sonLineIds.forEach { lineId ->
-            lineCheck(lineMap[lineId]!!)
-        }
+        lineCheck(lineMap[node.sonLineId]!!);
     }
 
     fun lineCheck(line: WorkFlowLine) {
         if (line.sonNodeIds.isEmpty()) {
             throw ModelDefileException("flowLine 应该具有目标节点")
         }
+        //todo line 的下个节点可能是node 也有可能是 gateway
+    }
+
+    fun gateWayCheck(gateWay: WorkFlowGateWay) {
+//        WorkFlowNodeType.EXCLUSIVE_GATEWAY -> {
+//            //todo 排他网关的每一条出库应该具有表达式,并且表达式要符合规则,最终得到
+//            for (sonLineId in node.sonLineId) {
+//                if (StrUtil.isBlank(lineMap[sonLineId]!!.flowConditionExpression)) {
+//                    throw ModelDefileException("排他网关 的 出路 应当具有条件表达式 !")
+//                }
+//            }
+//        }
     }
 
     fun cyclesCheck() {
