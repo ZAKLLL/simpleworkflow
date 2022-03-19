@@ -1,16 +1,13 @@
 package com.zakl.workflow.service
 
 import com.alibaba.fastjson.JSON
-import com.zakl.workflow.core.NodeConstant.Companion.ASSIGN_IDENTITY_ID_SPLIT_SYMBOL
+import com.zakl.workflow.core.Constant.Companion.ASSIGN_IDENTITY_ID_SPLIT_SYMBOL
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import java.util.stream.Collectors
-import kotlin.collections.ArrayList
 
 private const val SERVICE_BEAN_NAME: String = "processService";
 
@@ -58,7 +55,9 @@ class ProcessServiceImpl : ProcessService {
     @Autowired
     lateinit var modelService: ModelService
 
-
+    /**
+     * 开启新流程
+     */
     override fun startNewProcess(modelId: String, identityId: String, variables: Map<String, *>, assignValue: String) {
         var model: ModelConfig =
             modelMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle("modelId:{}流程不存在", modelId)
@@ -105,7 +104,7 @@ class ProcessServiceImpl : ProcessService {
         val nodeTask = NodeTask(
             processInstanceId = processInstance.id!!,
             nodeId = node.uId!!,
-            taskCnt = identityIds.size,
+            identityTaskCnt = identityIds.size,
             assignName = node.assignName!!,
             curAssignValue = assignValue
         )
@@ -113,7 +112,7 @@ class ProcessServiceImpl : ProcessService {
 
         val identityTasks = ArrayList<IdentityTask>();
 
-        for (identityId in identityIds) {
+        identityIds.forEach { identityId ->
             val identityTask = IdentityTask(
                 processInstanceId = processInstance.id!!,
                 nodeId = node.uId!!,

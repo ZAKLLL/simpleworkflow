@@ -26,7 +26,7 @@ class NodeTask(
     /**
      * 该节点任务分发的具体数量
      */
-    var taskCnt: Int,
+    var identityTaskCnt: Int,
 
     /**
      * 节点指定人占位符
@@ -78,6 +78,8 @@ class NodeTask(
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)
     }
+
+
 }
 
 @Mapper

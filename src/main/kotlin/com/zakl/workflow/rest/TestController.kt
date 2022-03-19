@@ -4,6 +4,7 @@ import com.zakl.workflow.entity.ModelConfig
 import com.zakl.workflow.entity.ModelConfigMapper
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
@@ -29,5 +30,12 @@ class TestController {
         modelConfig.tmpModel = "123";
         mapper.insert(modelConfig);
         return modelConfig;
+    }
+
+    @GetMapping("/t2")
+    @Cacheable(cacheNames = ["workflowComponent"])
+    fun t2(): Any {
+        println("-------")
+        return "hi";
     }
 }

@@ -1,6 +1,7 @@
 package com.zakl.workflow.service
 
 import com.zakl.workflow.core.WorkFlowNode
+import com.zakl.workflow.entity.NodeTask
 import org.springframework.stereotype.Service
 
 private const val SERVICE_BEAN_NAME: String = "modelservice";
@@ -30,6 +31,13 @@ interface ModelService {
      * 获取下一个节点
      */
     fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): WorkFlowNode
+
+
+    /**
+     * 检查当前节点是否满足结束条件
+     * （多人会签需要校验通过比例）
+     */
+    fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean
 }
 
 @Service(value = SERVICE_BEAN_NAME)
@@ -51,6 +59,10 @@ class ModelServiceImpl : ModelService {
     }
 
     override fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): WorkFlowNode {
+        TODO("Not yet implemented")
+    }
+
+    override fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean {
         TODO("Not yet implemented")
     }
 }
