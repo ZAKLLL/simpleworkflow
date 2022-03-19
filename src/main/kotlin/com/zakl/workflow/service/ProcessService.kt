@@ -1,12 +1,16 @@
 package com.zakl.workflow.service
 
 import com.alibaba.fastjson.JSON
+import com.zakl.workflow.core.NodeConstant.Companion.ASSIGN_IDENTITY_ID_SPLIT_SYMBOL
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
+import java.util.stream.Collectors
+import kotlin.collections.ArrayList
 
 private const val SERVICE_BEAN_NAME: String = "processService";
 
@@ -16,7 +20,7 @@ interface ProcessService {
     /**
      * 开启新流程
      */
-    fun startNewProcess(model: String, identityId: String, variables: Map<String, *>, assignValue: String)
+    fun startNewProcess(modelId: String, identityId: String, variables: Map<String, *>, assignValue: String)
 
     /**
      * 查询所分配的任务
@@ -70,7 +74,7 @@ class ProcessServiceImpl : ProcessService {
 //        val nextNode = modelService.getNextNode(startNode, variables);
 
         //将开始节点作为任务分发给申请人
-        val curIdentityTask = distributeIdentityTask(startNode, identityId)[0]
+        val curIdentityTask = distributeIdentityTask(processInstance, startNode, identityId)[0]
 
         completeTask(curIdentityTask.id!!, identityId, variables, assignValue)
 
@@ -89,7 +93,37 @@ class ProcessServiceImpl : ProcessService {
     }
 
 
-    private fun distributeIdentityTask(node: WorkFlowNode, assignValue: String): List<IdentityTask> {
-        return listOf();
+    /**
+     * 分发指定节点任务到 identity
+     */
+    private fun distributeIdentityTask(
+        processInstance: ProcessInstance,
+        node: WorkFlowNode,
+        assignValue: String
+    ): List<IdentityTask> {
+        val identityIds = assignValue.split(ASSIGN_IDENTITY_ID_SPLIT_SYMBOL)
+        val nodeTask = NodeTask(
+            processInstanceId = processInstance.id!!,
+            nodeId = node.uId!!,
+            taskCnt = identityIds.size,
+            assignName = node.assignName!!,
+            curAssignValue = assignValue
+        )
+        nodeTaskMapper.insert(nodeTask)
+
+        val identityTasks = ArrayList<IdentityTask>();
+
+        for (identityId in identityIds) {
+            val identityTask = IdentityTask(
+                processInstanceId = processInstance.id!!,
+                nodeId = node.uId!!,
+                nodeTaskId = nodeTask.id!!,
+                identityId = identityId
+            )
+            identityTaskMapper.insert(identityTask)
+            identityTasks.add(identityTask)
+        }
+
+        return identityTasks;
     }
 }

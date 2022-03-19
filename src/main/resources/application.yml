@@ -3,8 +3,9 @@ server:
 
 spring:
   datasource:
-    type: com.mysql.cj.jdbc.MysqlDataSource
-    url: jdbc:mysql://127.0.0.1/zaklworkflow
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zaklworkflow?serverTimezone=UTC&characterEncoding=utf-8
     username: root
     password: 123456
 

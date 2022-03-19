@@ -12,8 +12,29 @@ import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
 @TableName(value = IdentityTask.tableName)
-@AllArgsConstructor
-class IdentityTask : BasePersistentObject() {
+class IdentityTask(
+    /**
+     * 流程id
+     */
+    var processInstanceId: String,
+
+
+    /**
+     * 节点id
+     */
+    var nodeId: String,
+
+    /**
+     * 节点任务Id
+     */
+    var nodeTaskId: String,
+
+    /**
+     * 任务拥有者id
+     */
+    var identityId:String,
+
+    ) : BasePersistentObject() {
     companion object {
         const val tableName = "t_user_task"
     }
@@ -21,21 +42,6 @@ class IdentityTask : BasePersistentObject() {
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
 
-    /**
-     * 流程id
-     */
-    var processInstanceId: String? = null
-
-
-    /**
-     * 节点id
-     */
-    var nodeId: String? = null
-
-    /**
-     * 节点任务Id
-     */
-    var nodeTaskId: String? = null
 
     /**
      * 审批该节点时提交的表达式
@@ -76,6 +82,6 @@ class IdentityTask : BasePersistentObject() {
 }
 
 @Mapper
-interface IdentityTaskMapper : BaseMapper<NodeTask> {
+interface IdentityTaskMapper : BaseMapper<IdentityTask> {
 
 }

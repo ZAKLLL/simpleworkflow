@@ -16,11 +16,11 @@ class WorkFlowNode constructor(
     var type: NodeType?,
     var pid: String?,
     var sId: String?,
+    var assignName: String?,
     /**
-     * 多人会签
-     * 通过表达式
+     * 多人会签通过比例(默认为1)
      */
-    var endExpression: String?
+    var mutliCompleteRatio: Double? = 1.0
 )
 
 /**

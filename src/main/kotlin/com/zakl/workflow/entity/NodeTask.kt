@@ -12,7 +12,33 @@ import java.util.*
 
 @TableName(value = NodeTask.tableName)
 @AllArgsConstructor
-class NodeTask : BasePersistentObject() {
+class NodeTask(
+    /**
+     * 流程id
+     */
+    var processInstanceId: String,
+
+    /**
+     * 节点id
+     */
+    var nodeId: String,
+
+    /**
+     * 该节点任务分发的具体数量
+     */
+    var taskCnt: Int,
+
+    /**
+     * 节点指定人占位符
+     */
+    var assignName: String,
+
+    /**
+     * 当前节点assignvalue
+     */
+    var curAssignValue: String,
+
+    ) : BasePersistentObject() {
     companion object {
         const val tableName = "t_node_task"
     }
@@ -20,15 +46,6 @@ class NodeTask : BasePersistentObject() {
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
 
-    /**
-     * 流程id
-     */
-    var processInstanceId: String? = null
-
-    /**
-     * 节点id
-     */
-    var nodeId: String? = null
 
     /**
      * 开始时间
@@ -40,26 +57,12 @@ class NodeTask : BasePersistentObject() {
      */
     var endTime: Date? = null
 
-    /**
-     * 该节点任务分发的具体数量
-     */
-    var taskCnt: Int? = null
 
     /**
      * 该节点已经完成审批的数量
      */
-    var doneCnt: Int? = null
+    var doneCnt: Int = 0
 
-
-    /**
-     * 节点指定人占位符
-     */
-    var assignName: String? = null
-
-    /**
-     * 当前节点assignvalue
-     */
-    var curAssignValue: String? = null
 
     /**
      * 下个节点
