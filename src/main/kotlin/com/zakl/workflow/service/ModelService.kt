@@ -1,7 +1,9 @@
 package com.zakl.workflow.service
 
+import com.zakl.workflow.core.WorkFlowLine
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.NodeTask
+import com.zakl.workflow.service.dto.ModelInfo
 import org.springframework.stereotype.Service
 
 private const val SERVICE_BEAN_NAME: String = "modelservice";
@@ -30,7 +32,7 @@ interface ModelService {
     /**
      * 获取下一个节点
      */
-    fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): WorkFlowNode
+    fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode>
 
 
     /**
@@ -38,6 +40,20 @@ interface ModelService {
      * （多人会签需要校验通过比例）
      */
     fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean
+
+
+    /**
+     * 获取指定节点
+     */
+    fun getNode(nodeId: String): WorkFlowNode
+
+    /**
+     * 检查目标节点到当前节点是否存在并行网关
+     */
+    fun checkIfHasParallelGateWay(targetNode: WorkFlowNode, curNode: WorkFlowNode): Boolean
+
+
+
 }
 
 @Service(value = SERVICE_BEAN_NAME)
@@ -58,11 +74,19 @@ class ModelServiceImpl : ModelService {
         TODO("Not yet implemented")
     }
 
-    override fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): WorkFlowNode {
+    override fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
         TODO("Not yet implemented")
     }
 
     override fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getNode(nodeId: String): WorkFlowNode {
+        TODO("Not yet implemented")
+    }
+
+    override fun checkIfHasParallelGateWay(targetNode: WorkFlowNode, curNode: WorkFlowNode): Boolean {
         TODO("Not yet implemented")
     }
 }

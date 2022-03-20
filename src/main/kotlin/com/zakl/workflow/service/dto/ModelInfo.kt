@@ -1,4 +1,4 @@
-package com.zakl.workflow.service
+package com.zakl.workflow.service.dto
 
 import com.zakl.workflow.core.WorkFlowLine
 import com.zakl.workflow.core.WorkFlowNode

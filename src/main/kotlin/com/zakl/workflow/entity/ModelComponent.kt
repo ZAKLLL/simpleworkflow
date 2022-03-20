@@ -19,7 +19,7 @@ import java.util.*
 @AllArgsConstructor
 class ModelComponent : BasePersistentObject() {
     companion object {
-        const val tableName = "t_modelcomponent"
+        const val tableName = "t_model_component"
     }
 
     @TableId(type = IdType.ASSIGN_UUID)

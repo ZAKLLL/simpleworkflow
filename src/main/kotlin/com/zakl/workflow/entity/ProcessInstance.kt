@@ -30,7 +30,7 @@ data class ProcessInstance(
 
 ) : BasePersistentObject() {
     companion object {
-        const val tableName = "t_processInstance"
+        const val tableName = "t_process_Instance"
     }
 
     @TableId(type = IdType.ASSIGN_UUID)

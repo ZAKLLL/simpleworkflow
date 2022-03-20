@@ -21,6 +21,7 @@ class Constant {
 
         const val COMPONENT_TYPE_LINE = "line"
 
+        const val APPROVAL_COMMENT = "__APPROVAL_COMMENT";
 
     }
 
