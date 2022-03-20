@@ -17,17 +17,19 @@ import java.util.*
  */
 @TableName(ModelComponent.tableName)
 @AllArgsConstructor
-class ModelComponent : BasePersistentObject() {
+class ModelComponent(
+    var componetInfo: String,
+    var locationInfo: String,
+    var modelId: String,
+    var componentType: String,
+) : BasePersistentObject() {
     companion object {
         const val tableName = "t_model_component"
     }
 
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
-    var componetInfo: String? = null
-    var locationInfo: String? = null
-    var modelId: String? = null
-    var componentType: String = "node"
+
 }
 
 @Mapper

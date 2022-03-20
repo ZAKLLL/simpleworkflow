@@ -1,15 +1,17 @@
-package com.zakl.workflow.service
+package com.zakl.workflow.core.service
 
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.common.combineVariablesToStr
+import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.core.Constant.Companion.APPROVAL_COMMENT
-import com.zakl.workflow.core.Constant.Companion.ASSIGN_IDENTITY_ID_SPLIT_SYMBOL
 import com.zakl.workflow.core.NodeType
+import com.zakl.workflow.core.ProcessInstanceState
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
+import com.zakl.workflow.exception.NodeIdentityAssignException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -76,11 +78,8 @@ class ProcessServiceImpl : ProcessService {
         //生成startNode 的任务
         val startNode = modelService.getStartNode(modelId)
 
-        //获取当前表达式能够去到的下个节点
-//        val nextNode = modelService.getNextNode(startNode, variables);
-
         //将开始节点作为任务分发给申请人
-        val curIdentityTask = distributeIdentityTask(processInstance, startNode, identityId)[0]
+        val curIdentityTask = distributeIdentityTask(processInstance.id!!, startNode, listOf(identityId))[0]
 
         completeTask(curIdentityTask, identityId, variables, assignValue)
 
@@ -94,47 +93,45 @@ class ProcessServiceImpl : ProcessService {
     }
 
     override fun completeTask(
-        identityTask: IdentityTask,
-        identityId: String,
-        variables: Map<String, *>,
-        assignValue: String
+        identityTask: IdentityTask, identityId: String, variables: Map<String, *>, assignValue: String
     ) {
         val curNode = modelService.getNode(identityTask.nodeId)
 
-        identityTask
-            .also {
-                it.endTime = Date()
-                it.comment = variables[APPROVAL_COMMENT] as String?
-                it.nextAssignValue = assignValue
-                it.variables = JSON.toJSONString(variables)
-            }.run { identityTaskMapper.updateById(this) }
+        identityTask.also {
+            it.endTime = Date()
+            it.comment = variables[APPROVAL_COMMENT] as String?
+            it.nextAssignValue = assignValue
+            it.variables = JSON.toJSONString(variables)
+        }.run { identityTaskMapper.updateById(this) }
 
 
-        nodeTaskMapper.selectById(identityTask.nodeTaskId)
-            .also {
-                if (StrUtil.isBlank(it.nextAssignValue)) it.nextAssignValue = assignValue
-                else if (StrUtil.isNotBlank(assignValue)) it.nextAssignValue += ";$assignValue"
-                it.doneCnt++
-                it.variables = combineVariablesToStr(it.variables, variables)
-            }.also {
-                var nodeCompelted = false
-                if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
-                    if (it.doneCnt / it.identityTaskCnt >= curNode.mutliCompleteRatio!!) {
-                        nodeCompelted = true
-                    }
-                } else {
+        val nodeTask = nodeTaskMapper.selectById(identityTask.nodeTaskId).also {
+            if (StrUtil.isBlank(it.nextAssignValue)) it.nextAssignValue = assignValue
+            else if (StrUtil.isNotBlank(assignValue)) it.nextAssignValue += ";$assignValue"
+            it.doneCnt++
+            it.variables = combineVariablesToStr(it.variables, variables)
+        }.also {
+            var nodeCompelted = false
+            if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
+                if (it.doneCnt / it.identityTaskCnt >= curNode.mutliCompleteRatio!!) {
                     nodeCompelted = true
                 }
-                if (nodeCompelted) {
-                    it.endTime = Date()
-                    nodeTaskMapper.updateById(it)
-                } else {
-                    nodeTaskMapper.updateById(it)
-                    return
-                }
+            } else {
+                nodeCompelted = true
             }
+            if (nodeCompelted) {
+                it.endTime = Date()
+                nodeTaskMapper.updateById(it)
+            } else {
+                nodeTaskMapper.updateById(it)
+                //节点为多人会签节点，并且不满足结束条件
+                return
+            }
+        }
 
         val nextNodes = modelService.getNextNode(curNode, variables);
+        if (checkIfProcessInstanceCompleted(nextNodes, nodeTask)) return
+
         nextNodes.any { i -> modelService.checkIfHasParallelGateWay(i, curNode) }.run {
             if (this) {
                 //todo 这个功能是否应该放在 模板检测模块
@@ -142,17 +139,32 @@ class ProcessServiceImpl : ProcessService {
             }
         }
 
-
-        if (nextNodes.size == 1) {
-            //排他网关,或者直达下一个节点
-
-        } else {
-
-            //并行网关
-            //todo 并行网关的情况下 怎么指定目标节点人是谁
-
+        for (nextNode in nextNodes) {
+            val nextNodeIdentityIds =
+                getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.uId!!)
+            if (nextNodeIdentityIds.isEmpty()) {
+                throw NodeIdentityAssignException("nextNodeIdentityIds.isEmpty ! ,nextNode:$nextNode")
+            }
+            distributeIdentityTask(processInstanceId = nodeTask.processInstanceId, nextNode, nextNodeIdentityIds)
         }
 
+    }
+
+    /**
+     *  校验是否流程结束
+     */
+    private fun checkIfProcessInstanceCompleted(
+        nextNodes: List<WorkFlowNode>,
+        nodeTask: NodeTask
+    ): Boolean {
+        if (nextNodes.size == 1 && nextNodes[0].type == NodeType.END_NODE) {
+            //流程结束
+            var processInstance = processInstanceMapper.selectById(nodeTask.processInstanceId)
+            processInstance.endTime = Date()
+            processInstance.instanceState = ProcessInstanceState.PASSED.code
+            return true
+        }
+        return false
     }
 
     override fun recallTask(processInstanceId: String) {
@@ -164,25 +176,21 @@ class ProcessServiceImpl : ProcessService {
      * 分发指定节点任务到 identity
      */
     private fun distributeIdentityTask(
-        processInstance: ProcessInstance,
-        node: WorkFlowNode,
-        assignValue: String
+        processInstanceId: String, node: WorkFlowNode, assignIdentityIds: List<String>
     ): List<IdentityTask> {
-        val identityIds = assignValue.split(ASSIGN_IDENTITY_ID_SPLIT_SYMBOL)
         val nodeTask = NodeTask(
-            processInstanceId = processInstance.id!!,
+            processInstanceId = processInstanceId,
             nodeId = node.uId!!,
-            identityTaskCnt = identityIds.size,
-            assignName = node.assignName!!,
-            curAssignValue = assignValue
+            identityTaskCnt = assignIdentityIds.size,
+            curIdentityIds = assignIdentityIds.joinToString(";")
         )
         nodeTaskMapper.insert(nodeTask)
 
         val identityTasks = ArrayList<IdentityTask>();
 
-        identityIds.forEach { identityId ->
+        assignIdentityIds.forEach { identityId ->
             val identityTask = IdentityTask(
-                processInstanceId = processInstance.id!!,
+                processInstanceId = processInstanceId,
                 nodeId = node.uId!!,
                 nodeTaskId = nodeTask.id!!,
                 identityId = identityId

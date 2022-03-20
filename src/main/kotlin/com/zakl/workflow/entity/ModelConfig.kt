@@ -17,7 +17,9 @@ import java.util.*
  */
 @TableName(ModelConfig.tableName)
 @AllArgsConstructor
-class ModelConfig : BasePersistentObject() {
+class ModelConfig(
+    var tmpModel: String
+) : BasePersistentObject() {
     companion object {
         const val tableName = "t_model_config"
     }
@@ -25,7 +27,6 @@ class ModelConfig : BasePersistentObject() {
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
     var releaseModel: String? = null
-    var tmpModel: String? = null
     var deployTime: Date? = null
 
 }

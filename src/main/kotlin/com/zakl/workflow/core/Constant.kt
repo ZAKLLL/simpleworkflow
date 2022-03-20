@@ -15,6 +15,13 @@ class Constant {
          */
         const val ASSIGN_IDENTITY_ID_SPLIT_SYMBOL = ";"
 
+        /**
+         * nodeId 与 identityId 链接符号
+         */
+        const val ASSIGN_NODE_IDENTITY_LINK_SYMBOL = ":"
+
+
+
         const val COMPONENT_TYPE_NODE = "node"
 
         const val COMPONENT_TYPE_GATEWAY = "gateway"

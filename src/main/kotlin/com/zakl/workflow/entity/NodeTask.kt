@@ -31,12 +31,13 @@ class NodeTask(
     /**
      * 节点指定人占位符
      */
-    var assignName: String,
+//    var assignName: String,
 
     /**
-     * 当前节点assignvalue
+     * 当前节点指定人(>=1)
+     * identityId1;identityId2;IdentityId3
      */
-    var curAssignValue: String,
+    var curIdentityIds: String,
 
     ) : BasePersistentObject() {
     companion object {
@@ -66,6 +67,7 @@ class NodeTask(
 
     /**
      * 下个节点
+     * nodeId1:identityId1;nodeId2:identityId2;
      */
     var nextAssignValue: String? = null
 

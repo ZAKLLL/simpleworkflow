@@ -7,6 +7,11 @@ package com.zakl.workflow.core
  * @author ZhangJiaKui
  */
 
+open class ModelComponentBase {
+    var id: String? = null
+    var name: String? = null
+}
+
 /**
  * 工作流节点
  */
@@ -16,12 +21,11 @@ class WorkFlowNode constructor(
     var type: NodeType?,
     var pid: String?,
     var sId: String?,
-    var assignName: String?,
     /**
      * 多人会签通过比例(默认为1)
      */
     var mutliCompleteRatio: Double? = 1.0
-)
+) : ModelComponentBase()
 
 /**
  * 工作流路

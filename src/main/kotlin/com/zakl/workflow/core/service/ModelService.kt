@@ -1,10 +1,17 @@
-package com.zakl.workflow.service
+package com.zakl.workflow.core.service
 
+import cn.hutool.core.util.StrUtil
+import com.alibaba.fastjson.JSON
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_GATEWAY
 import com.zakl.workflow.core.WorkFlowLine
 import com.zakl.workflow.core.WorkFlowNode
-import com.zakl.workflow.entity.NodeTask
-import com.zakl.workflow.service.dto.ModelInfo
+import com.zakl.workflow.core.service.dto.ModelInfo
+import com.zakl.workflow.entity.*
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import springfox.documentation.swagger2.mappers.ModelMapper
+import java.sql.Wrapper
 
 private const val SERVICE_BEAN_NAME: String = "modelservice";
 
@@ -12,7 +19,7 @@ interface ModelService {
     /**
      * 更新model
      */
-    fun insertOrUpdateConfig(modelId: String, modelInfo: ModelInfo)
+    fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo)
 
     /**
      * 部署流程
@@ -53,13 +60,44 @@ interface ModelService {
     fun checkIfHasParallelGateWay(targetNode: WorkFlowNode, curNode: WorkFlowNode): Boolean
 
 
-
 }
 
 @Service(value = SERVICE_BEAN_NAME)
 class ModelServiceImpl : ModelService {
-    override fun insertOrUpdateConfig(modelId: String, modelInfo: ModelInfo) {
-        TODO("Not yet implemented")
+
+    @Autowired
+    lateinit var modelComponentMapper: ModelComponentMapper
+
+    @Autowired
+    lateinit var modelConfigMapper: ModelConfigMapper
+
+
+    override fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo) {
+        val model: ModelConfig?
+        if (StrUtil.isNotBlank(modelId)) {
+            model = modelConfigMapper.selectById(modelId)
+            model.tmpModel = JSON.toJSONString(modelInfo)
+            modelConfigMapper.updateById(model)
+        } else {
+            model = ModelConfig(JSON.toJSONString(modelInfo));
+            modelConfigMapper.insert(model)
+        }
+        modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model!!.id))
+        //todo 补充位置信息
+        modelInfo.also { it ->
+            run {
+                it.gateWays.map { i ->
+                    modelComponentMapper.insert(
+                        ModelComponent(
+                            JSON.toJSONString(i),
+                            "todo ",
+                            model.id!!,
+                            COMPONENT_TYPE_GATEWAY
+                        )
+                    )
+                }
+            }
+        }
     }
 
     override fun deployModel(modelId: String) {

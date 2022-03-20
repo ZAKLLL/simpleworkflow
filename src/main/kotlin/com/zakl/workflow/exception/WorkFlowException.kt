@@ -14,3 +14,6 @@ class ModelDefineException(message: String?) : RuntimeException(message) {
 class ProcessException(message: String?) : RuntimeException(message) {
 
 }
+class NodeIdentityAssignException(message: String?) : RuntimeException(message) {
+
+}
