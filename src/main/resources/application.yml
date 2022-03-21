@@ -25,4 +25,8 @@ spring:
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
+  global-config:
+    db-config:
+      update-strategy: ignored
+
 

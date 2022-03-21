@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import lombok.AllArgsConstructor
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Param
+import org.apache.ibatis.annotations.Update
 import java.util.*
 
 /**
@@ -28,10 +30,13 @@ class ModelConfig(
     var id: String? = null
     var releaseModel: String? = null
     var deployTime: Date? = null
-
+    var isDeploy: Boolean = false
 }
 
 @Mapper
 interface ModelConfigMapper : BaseMapper<ModelConfig> {
+
+    @Update("update t_model_config set releaseModel=tmpModel where modelId =#{modelId}")
+    fun deployModel(@Param("modelId") modelId: String)
 
 }

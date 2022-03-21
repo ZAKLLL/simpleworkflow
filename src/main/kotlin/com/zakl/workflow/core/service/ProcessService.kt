@@ -111,15 +111,15 @@ class ProcessServiceImpl : ProcessService {
             it.doneCnt++
             it.variables = combineVariablesToStr(it.variables, variables)
         }.also {
-            var nodeCompelted = false
+            var nodeCompleted = false
             if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
                 if (it.doneCnt / it.identityTaskCnt >= curNode.mutliCompleteRatio!!) {
-                    nodeCompelted = true
+                    nodeCompleted = true
                 }
             } else {
-                nodeCompelted = true
+                nodeCompleted = true
             }
-            if (nodeCompelted) {
+            if (nodeCompleted) {
                 it.endTime = Date()
                 nodeTaskMapper.updateById(it)
             } else {

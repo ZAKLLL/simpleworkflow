@@ -9,7 +9,7 @@ import com.zakl.workflow.exception.ModelDefineException
  * @date 3/18/2022 4:31 PM
  * @author ZhangJiaKui
  */
-class ModelCheck(
+class ModelChecker(
     var nodeMap: Map<String, WorkFlowNode>,
     var lineMap: Map<String, WorkFlowLine>,
     var gatewayMap: Map<String, WorkFlowGateWay>,

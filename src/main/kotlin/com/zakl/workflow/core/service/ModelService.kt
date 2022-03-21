@@ -103,11 +103,11 @@ class ModelServiceImpl : ModelService {
     }
 
     override fun deployModel(modelId: String) {
-        TODO("Not yet implemented")
+        modelConfigMapper.deployModel(modelId)
     }
 
     override fun deleteModel(modelId: String) {
-        TODO("Not yet implemented")
+        modelConfigMapper.deleteById(modelId)
     }
 
     override fun getStartNode(modelId: String): WorkFlowNode {
