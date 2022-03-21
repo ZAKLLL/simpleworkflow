@@ -35,33 +35,6 @@ interface ModelService {
      */
     fun deleteModel(modelId: String)
 
-    /**
-     * 获取开始节点
-     */
-    fun getStartNode(modelId: String): WorkFlowNode
-
-    /**
-     * 获取下一个节点
-     */
-    fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode>
-
-
-    /**
-     * 检查当前节点是否满足结束条件
-     * （多人会签需要校验通过比例）
-     */
-    fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean
-
-
-    /**
-     * 获取指定节点
-     */
-    fun getNode(nodeId: String): WorkFlowNode
-
-    /**
-     * 检查目标节点到当前节点是否存在并行网关
-     */
-    fun checkIfHasParallelGateWay(targetNode: WorkFlowNode, curNode: WorkFlowNode): Boolean
 
 
 }
@@ -110,23 +83,4 @@ class ModelServiceImpl : ModelService {
         modelConfigMapper.deleteById(modelId)
     }
 
-    override fun getStartNode(modelId: String): WorkFlowNode {
-        TODO("Not yet implemented")
-    }
-
-    override fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
-        TODO("Not yet implemented")
-    }
-
-    override fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun getNode(nodeId: String): WorkFlowNode {
-        TODO("Not yet implemented")
-    }
-
-    override fun checkIfHasParallelGateWay(targetNode: WorkFlowNode, curNode: WorkFlowNode): Boolean {
-        TODO("Not yet implemented")
-    }
 }

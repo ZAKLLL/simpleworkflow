@@ -21,13 +21,25 @@ class Constant {
         const val ASSIGN_NODE_IDENTITY_LINK_SYMBOL = ":"
 
 
-
+        /**
+         * 工作流组件类型-节点
+         */
         const val COMPONENT_TYPE_NODE = "node"
 
+        /**
+         * 工作流组件类型-网关
+         */
         const val COMPONENT_TYPE_GATEWAY = "gateway"
 
+        /**
+         * 工作流组件类型-line
+         */
         const val COMPONENT_TYPE_LINE = "line"
 
+
+        /**
+         * 审批评论
+         */
         const val APPROVAL_COMMENT = "__APPROVAL_COMMENT";
 
     }

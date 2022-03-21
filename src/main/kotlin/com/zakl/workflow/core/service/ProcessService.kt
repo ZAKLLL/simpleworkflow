@@ -62,7 +62,7 @@ class ProcessServiceImpl : ProcessService {
     lateinit var identityTaskMapper: IdentityTaskMapper
 
     @Autowired
-    lateinit var modelService: ModelService
+    lateinit var nodeRelService: NodeRelService
 
     /**
      * 开启新流程
@@ -76,7 +76,7 @@ class ProcessServiceImpl : ProcessService {
         processInstanceMapper.insert(processInstance);
 
         //生成startNode 的任务
-        val startNode = modelService.getStartNode(modelId)
+        val startNode = nodeRelService.getStartNode(modelId)
 
         //将开始节点作为任务分发给申请人
         val curIdentityTask = distributeIdentityTask(processInstance.id!!, startNode, listOf(identityId))[0]
@@ -95,7 +95,7 @@ class ProcessServiceImpl : ProcessService {
     override fun completeTask(
         identityTask: IdentityTask, identityId: String, variables: Map<String, *>, assignValue: String
     ) {
-        val curNode = modelService.getNode(identityTask.nodeId)
+        val curNode = nodeRelService.getNode(identityTask.nodeId)
 
         identityTask.also {
             it.endTime = Date()
@@ -111,28 +111,23 @@ class ProcessServiceImpl : ProcessService {
             it.doneCnt++
             it.variables = combineVariablesToStr(it.variables, variables)
         }.also {
-            var nodeCompleted = false
-            if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
-                if (it.doneCnt / it.identityTaskCnt >= curNode.mutliCompleteRatio!!) {
-                    nodeCompleted = true
-                }
-            } else {
-                nodeCompleted = true
-            }
-            if (nodeCompleted) {
+            if (nodeRelService.checkIfNodeCanComplete(it)) {
                 it.endTime = Date()
                 nodeTaskMapper.updateById(it)
             } else {
                 nodeTaskMapper.updateById(it)
-                //节点为多人会签节点，并且不满足结束条件
+                //节点为多人会签节点，并且不满足结束条件,不进行节点跳转
                 return
             }
         }
 
-        val nextNodes = modelService.getNextNode(curNode, variables);
+        //todo 如何校验网关存在多条入口的时候,需要校验是否每条路径的任务均到达
+        nodeRelService.checkIfCanPassedGateWay(curNode);
+
+        val nextNodes = nodeRelService.getNextNode(curNode, variables);
         if (checkIfProcessInstanceCompleted(nextNodes, nodeTask)) return
 
-        nextNodes.any { i -> modelService.checkIfHasParallelGateWay(i, curNode) }.run {
+        nextNodes.any { i -> nodeRelService.checkIfHasParallel(curNode, i) }.run {
             if (this) {
                 //todo 这个功能是否应该放在 模板检测模块
                 throw CustomException.neSlf4jStyle("不可将节点提交到并行网关之前!")
@@ -141,7 +136,7 @@ class ProcessServiceImpl : ProcessService {
 
         for (nextNode in nextNodes) {
             val nextNodeIdentityIds =
-                getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.id!!)
+                getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.id)
             if (nextNodeIdentityIds.isEmpty()) {
                 throw NodeIdentityAssignException("nextNodeIdentityIds.isEmpty ! ,nextNode:$nextNode")
             }
@@ -180,7 +175,7 @@ class ProcessServiceImpl : ProcessService {
     ): List<IdentityTask> {
         val nodeTask = NodeTask(
             processInstanceId = processInstanceId,
-            nodeId = node.id!!,
+            nodeId = node.id,
             identityTaskCnt = assignIdentityIds.size,
             curIdentityIds = assignIdentityIds.joinToString(";")
         )
@@ -191,7 +186,7 @@ class ProcessServiceImpl : ProcessService {
         assignIdentityIds.forEach { identityId ->
             val identityTask = IdentityTask(
                 processInstanceId = processInstanceId,
-                nodeId = node.id!!,
+                nodeId = node.id,
                 nodeTaskId = nodeTask.id!!,
                 identityId = identityId
             )
