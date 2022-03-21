@@ -141,7 +141,7 @@ class ProcessServiceImpl : ProcessService {
 
         for (nextNode in nextNodes) {
             val nextNodeIdentityIds =
-                getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.uId!!)
+                getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.id!!)
             if (nextNodeIdentityIds.isEmpty()) {
                 throw NodeIdentityAssignException("nextNodeIdentityIds.isEmpty ! ,nextNode:$nextNode")
             }
@@ -180,7 +180,7 @@ class ProcessServiceImpl : ProcessService {
     ): List<IdentityTask> {
         val nodeTask = NodeTask(
             processInstanceId = processInstanceId,
-            nodeId = node.uId!!,
+            nodeId = node.id!!,
             identityTaskCnt = assignIdentityIds.size,
             curIdentityIds = assignIdentityIds.joinToString(";")
         )
@@ -191,7 +191,7 @@ class ProcessServiceImpl : ProcessService {
         assignIdentityIds.forEach { identityId ->
             val identityTask = IdentityTask(
                 processInstanceId = processInstanceId,
-                nodeId = node.uId!!,
+                nodeId = node.id!!,
                 nodeTaskId = nodeTask.id!!,
                 identityId = identityId
             )

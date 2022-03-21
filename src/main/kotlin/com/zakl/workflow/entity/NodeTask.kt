@@ -28,10 +28,6 @@ class NodeTask(
      */
     var identityTaskCnt: Int,
 
-    /**
-     * 节点指定人占位符
-     */
-//    var assignName: String,
 
     /**
      * 当前节点指定人(>=1)

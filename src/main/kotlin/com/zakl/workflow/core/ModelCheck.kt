@@ -65,7 +65,7 @@ class ModelCheck(
         //除根节点之外,每个节点都应该具有preLine,并且sonLine 不能为空
         nodeMap.values.forEach { i ->
             run {
-                if (i.uId != startNode!!.uId && i.uId != endNode!!.uId) {
+                if (i.id != startNode!!.id && i.id != endNode!!.id) {
                     if (StrUtil.isBlank(i.sId)) {
                         throw ModelDefineException("除 end节点之外的每个节点都应该具有 出路")
                     }
@@ -93,11 +93,11 @@ class ModelCheck(
      */
     private fun nodeCheck(node: WorkFlowNode, vis: Set<String>) {
         //如果出现环路,环路上必须出现排他网关，且此排他网关必须拥有具备通向end的路径
-        if (vis.contains(node.uId)) {
+        if (vis.contains(node.id)) {
             needToCheckCycles.plus(vis)
             return
         } else {
-            vis.plus(node.uId)
+            vis.plus(node.id)
         }
         when (node.type) {
             //end节点需要校验是否为
@@ -119,11 +119,11 @@ class ModelCheck(
      * 连接线检查
      */
     private fun lineCheck(line: WorkFlowLine, vis: Set<String>) {
-        if (vis.contains(line.uId)) {
+        if (vis.contains(line.id)) {
             needToCheckCycles.plus(vis)
             return
         } else {
-            vis.plus(line.uId)
+            vis.plus(line.id)
         }
 
         if (StrUtil.isBlank(line.sId)) {
@@ -142,11 +142,11 @@ class ModelCheck(
      */
     private fun gateWayCheck(gateWay: WorkFlowGateWay, vis: Set<String>) {
 
-        if (vis.contains(gateWay.uId)) {
+        if (vis.contains(gateWay.id)) {
             needToCheckCycles.plus(vis)
             return
         } else {
-            vis.plus(gateWay.uId)
+            vis.plus(gateWay.id)
         }
         when (gateWay.type) {
             GatewayType.EXCLUSIVE_GATEWAY -> {

@@ -22,15 +22,15 @@ class TestController {
     @Autowired
     lateinit var mapper: ModelConfigMapper
 
-    @GetMapping("/tt")
-    fun t1(): Any {
-        val modelConfig = ModelConfig()
-        modelConfig.releaseModel = "123";
-        modelConfig.deployTime = Date();
-        modelConfig.tmpModel = "123";
-        mapper.insert(modelConfig);
-        return modelConfig;
-    }
+//    @GetMapping("/tt")
+//    fun t1(): Any {
+//        val modelConfig = ModelConfig()
+//        modelConfig.releaseModel = "123";
+//        modelConfig.deployTime = Date();
+//        modelConfig.tmpModel = "123";
+//        mapper.insert(modelConfig);
+//        return modelConfig;
+//    }
 
     @GetMapping("/t2")
     @Cacheable(cacheNames = ["workflowComponent"])

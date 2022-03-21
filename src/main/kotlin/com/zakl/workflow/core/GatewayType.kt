@@ -9,12 +9,12 @@ package com.zakl.workflow.core
 enum class GatewayType {
 
     /**
-     * 单入口排他网关
+     * 排他网关
      */
     EXCLUSIVE_GATEWAY,
 
     /**
-     * 单入口并行网关
+     * 并行网关
      */
     PARALLEL_GATEWAY,
 

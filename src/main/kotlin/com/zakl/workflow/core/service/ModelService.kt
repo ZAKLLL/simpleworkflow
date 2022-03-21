@@ -4,10 +4,14 @@ import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_GATEWAY
+import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_LINE
+import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_NODE
+import com.zakl.workflow.core.WorkFlowComponentBase
 import com.zakl.workflow.core.WorkFlowLine
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.entity.*
+import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import springfox.documentation.swagger2.mappers.ModelMapper
@@ -73,31 +77,29 @@ class ModelServiceImpl : ModelService {
 
 
     override fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo) {
-        val model: ModelConfig?
+        val model: ModelConfig
         if (StrUtil.isNotBlank(modelId)) {
-            model = modelConfigMapper.selectById(modelId)
+            model = modelConfigMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle(
+                "modeId: {} can not found!",
+                modelId!!
+            )
             model.tmpModel = JSON.toJSONString(modelInfo)
             modelConfigMapper.updateById(model)
         } else {
             model = ModelConfig(JSON.toJSONString(modelInfo));
             modelConfigMapper.insert(model)
         }
-        modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model!!.id))
-        //todo 补充位置信息
-        modelInfo.also { it ->
-            run {
-                it.gateWays.map { i ->
-                    modelComponentMapper.insert(
-                        ModelComponent(
-                            JSON.toJSONString(i),
-                            "todo ",
-                            model.id!!,
-                            COMPONENT_TYPE_GATEWAY
-                        )
-                    )
-                }
-            }
-        }
+        modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model.id))
+
+        modelInfo.run {
+            val workFlowComponents = ArrayList<WorkFlowComponentBase>()
+            workFlowComponents.addAll(this.nodes)
+            workFlowComponents.addAll(this.lines)
+            workFlowComponents.addAll(this.gateWays)
+            return@run workFlowComponents
+        }.map { i -> ModelComponent(i.id, model.id!!, JSON.toJSONString(i), i.componentType) }
+            .forEach(modelComponentMapper::insert)
+
     }
 
     override fun deployModel(modelId: String) {
