@@ -3,19 +3,14 @@ package com.zakl.workflow.core.service
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_GATEWAY
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_LINE
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_NODE
+import com.zakl.workflow.core.ModelChecker
 import com.zakl.workflow.core.WorkFlowComponentBase
-import com.zakl.workflow.core.WorkFlowLine
-import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import springfox.documentation.swagger2.mappers.ModelMapper
-import java.sql.Wrapper
+import org.springframework.transaction.annotation.Transactional
 
 private const val SERVICE_BEAN_NAME: String = "modelservice";
 
@@ -36,10 +31,10 @@ interface ModelService {
     fun deleteModel(modelId: String)
 
 
-
 }
 
 @Service(value = SERVICE_BEAN_NAME)
+@Transactional
 class ModelServiceImpl : ModelService {
 
     @Autowired
@@ -50,6 +45,8 @@ class ModelServiceImpl : ModelService {
 
 
     override fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo) {
+        ModelChecker.modelCheck(modelInfo)
+
         val model: ModelConfig
         if (StrUtil.isNotBlank(modelId)) {
             model = modelConfigMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle(
@@ -68,7 +65,7 @@ class ModelServiceImpl : ModelService {
             val workFlowComponents = ArrayList<WorkFlowComponentBase>()
             workFlowComponents.addAll(this.nodes)
             workFlowComponents.addAll(this.lines)
-            workFlowComponents.addAll(this.gateWays)
+            workFlowComponents.addAll(this.gateways)
             return@run workFlowComponents
         }.map { i -> ModelComponent(i.id, model.id!!, JSON.toJSONString(i), i.componentType) }
             .forEach(modelComponentMapper::insert)

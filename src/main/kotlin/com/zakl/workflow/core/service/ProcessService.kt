@@ -7,7 +7,7 @@ import com.zakl.workflow.common.combineVariablesToStr
 import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.core.Constant.Companion.APPROVAL_COMMENT
 import com.zakl.workflow.core.NodeType
-import com.zakl.workflow.core.ProcessInstanceState
+import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
@@ -42,6 +42,7 @@ interface ProcessService {
      * 撤回流程
      */
     fun recallTask(processInstanceId: String)
+
 
 }
 
@@ -99,6 +100,7 @@ class ProcessServiceImpl : ProcessService {
 
         identityTask.also {
             it.endTime = Date()
+            it.workFlowState=WorkFlowState.DONE.code
             it.comment = variables[APPROVAL_COMMENT] as String?
             it.nextAssignValue = assignValue
             it.variables = JSON.toJSONString(variables)
@@ -113,6 +115,7 @@ class ProcessServiceImpl : ProcessService {
         }.also {
             if (nodeRelService.checkIfNodeCanComplete(it)) {
                 it.endTime = Date()
+                it.workFlowState = WorkFlowState.DONE.code
                 nodeTaskMapper.updateById(it)
             } else {
                 nodeTaskMapper.updateById(it)
@@ -121,11 +124,14 @@ class ProcessServiceImpl : ProcessService {
             }
         }
 
-        //todo 如何校验网关存在多条入口的时候,需要校验是否每条路径的任务均到达
-        nodeRelService.checkIfCanPassedGateWay(curNode);
 
-        val nextNodes = nodeRelService.getNextNode(curNode, variables);
-        if (checkIfProcessInstanceCompleted(nextNodes, nodeTask)) return
+        val nextNodes = nodeRelService.getNextNodesByGateWay(curNode, variables);
+        //校验当前分支结束
+        if (checkIfCurrentBranchCompleted(nextNodes)) {
+            //校验流程结束
+            checkIfProcessInstanceCompleted(nodeTask);
+            return
+        }
 
         nextNodes.any { i -> nodeRelService.checkIfHasParallel(curNode, i) }.run {
             if (this) {
@@ -145,22 +151,38 @@ class ProcessServiceImpl : ProcessService {
 
     }
 
+
     /**
-     *  校验是否流程结束
+     *  校验是否当前分支是否结束
      */
-    private fun checkIfProcessInstanceCompleted(
-        nextNodes: List<WorkFlowNode>,
-        nodeTask: NodeTask
+    private fun checkIfCurrentBranchCompleted(
+        nextNodes: List<WorkFlowNode>
     ): Boolean {
         if (nextNodes.size == 1 && nextNodes[0].type == NodeType.END_NODE) {
-            //流程结束
-            var processInstance = processInstanceMapper.selectById(nodeTask.processInstanceId)
-            processInstance.endTime = Date()
-            processInstance.instanceState = ProcessInstanceState.PASSED.code
             return true
         }
         return false
     }
+
+
+    /**
+     * 校验当前流程是否结束
+     * 通过所有任务节点是否已经完成
+     */
+    private fun checkIfProcessInstanceCompleted(nodeTask: NodeTask) {
+        val processInstance = processInstanceMapper.selectById(nodeTask.processInstanceId)
+        nodeTaskMapper.selectList(
+            QueryWrapper<NodeTask?>().isNotNull("endTime").eq("processInstanceId", processInstance.id)
+        ).run {
+            //不存在未完成的任务节点
+            if (this.isEmpty()) {
+                processInstance.endTime = Date()
+                processInstance.instanceState = WorkFlowState.DONE.code
+            }
+        }
+        processInstanceMapper.updateById(processInstance)
+    }
+
 
     override fun recallTask(processInstanceId: String) {
         TODO("Not yet implemented")

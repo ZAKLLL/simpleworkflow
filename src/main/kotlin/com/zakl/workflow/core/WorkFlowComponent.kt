@@ -48,7 +48,7 @@ class WorkFlowLine constructor(
 /**
  * 网关
  */
-class WorkFlowGateWay constructor(
+class WorkFlowGateway constructor(
     id: String,
     name: String,
     locationInfo: String,

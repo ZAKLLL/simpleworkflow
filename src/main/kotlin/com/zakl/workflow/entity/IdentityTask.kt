@@ -1,13 +1,12 @@
 package com.zakl.workflow.entity
 
-import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
-import lombok.AllArgsConstructor
+import com.zakl.workflow.core.WorkFlowState
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
@@ -32,7 +31,7 @@ class IdentityTask(
     /**
      * 任务拥有者id
      */
-    var identityId:String,
+    var identityId: String,
 
     ) : BasePersistentObject() {
     companion object {
@@ -41,12 +40,6 @@ class IdentityTask(
 
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
-
-
-    /**
-     * 审批该节点时提交的表达式
-     */
-    var flowExpression: String? = null
 
 
     /**
@@ -65,6 +58,10 @@ class IdentityTask(
      */
     var endTime: Date? = null
 
+    /**
+     * 流程状态
+     */
+    var workFlowState: Int = WorkFlowState.HANDLING.code
 
     /**
      * identity 变量

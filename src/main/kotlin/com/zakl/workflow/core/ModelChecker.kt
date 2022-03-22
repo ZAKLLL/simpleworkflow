@@ -1,7 +1,9 @@
 package com.zakl.workflow.core
 
 import cn.hutool.core.util.StrUtil
+import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.exception.ModelDefineException
+import java.util.stream.Collectors
 
 /**
  * @classname ModelCheck
@@ -9,11 +11,29 @@ import com.zakl.workflow.exception.ModelDefineException
  * @date 3/18/2022 4:31 PM
  * @author ZhangJiaKui
  */
-class ModelChecker(
+class ModelChecker private constructor(
     var nodeMap: Map<String, WorkFlowNode>,
     var lineMap: Map<String, WorkFlowLine>,
-    var gatewayMap: Map<String, WorkFlowGateWay>,
+    var gatewayMap: Map<String, WorkFlowGateway>
 ) {
+
+
+    companion object {
+        fun modelCheck(modelInfo: ModelInfo): Boolean {
+            ModelChecker(
+                modelInfo.nodes.stream().collect(
+                    Collectors.toMap({ i -> i.id }, { v -> v })
+                ),
+                modelInfo.lines.stream().collect(
+                    Collectors.toMap({ i -> i.id }, { v -> v })
+                ),
+                modelInfo.gateways.stream().collect(
+                    Collectors.toMap({ i -> i.id }, { v -> v })
+                )
+            ).modelValidCheck();
+            return true
+        }
+    }
 
     /**
      * 具有 到达 end节点通路 的节点Id
@@ -140,7 +160,7 @@ class ModelChecker(
     /**
      * 路由检查
      */
-    private fun gateWayCheck(gateWay: WorkFlowGateWay, vis: Set<String>) {
+    private fun gateWayCheck(gateWay: WorkFlowGateway, vis: Set<String>) {
 
         if (vis.contains(gateWay.id)) {
             needToCheckCycles.plus(vis)
@@ -152,8 +172,12 @@ class ModelChecker(
             GatewayType.EXCLUSIVE_GATEWAY -> {
                 // 排他网关的每一条出库应该具有表达式,并且表达式要符合规则,最终得到
                 for (sonLineId in gateWay.sIds) {
-                    if (StrUtil.isBlank(lineMap[sonLineId]!!.flowConditionExpression)) {
-                        throw ModelDefineException("单入口排他网关 的 出路 应当具有条件表达式 !")
+                    val workFlowLine = lineMap[sonLineId]!!
+                    if (StrUtil.isBlank(workFlowLine.flowConditionExpression)) {
+                        throw ModelDefineException("单入口排他网关 的 出路 应当具有条件表达式,且表达式格式应当正确 !")
+                    }
+                    if (checkConditionExpressionFormat(workFlowLine.flowConditionExpression!!)) {
+                        throw ModelDefineException("单入口排他网关 的 出路 ,且表达式格式错误 !" + workFlowLine.flowConditionExpression)
                     }
                 }
             }

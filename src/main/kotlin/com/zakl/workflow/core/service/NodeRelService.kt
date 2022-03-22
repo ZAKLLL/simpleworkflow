@@ -2,17 +2,15 @@ package com.zakl.workflow.core.service
 
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.zakl.workflow.core.*
 import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_GATEWAY
 import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_LINE
 import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_NODE
-import com.zakl.workflow.core.NodeType
-import com.zakl.workflow.core.WorkFlowGateWay
-import com.zakl.workflow.core.WorkFlowLine
-import com.zakl.workflow.core.WorkFlowNode
 import com.zakl.workflow.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.concurrent.ConcurrentHashMap
 import javax.annotation.PostConstruct
 
@@ -26,6 +24,7 @@ import javax.annotation.PostConstruct
 private const val SERVICE_BEAN_NAME: String = "modelservice";
 
 @Service(value = SERVICE_BEAN_NAME)
+@Transactional
 class NodeRelService {
 
     @Autowired
@@ -36,7 +35,7 @@ class NodeRelService {
 
     var nodeMap: MutableMap<String, WorkFlowNode> = ConcurrentHashMap()
     var lineMap: MutableMap<String, WorkFlowLine> = ConcurrentHashMap()
-    var gatewayMap: MutableMap<String, WorkFlowGateWay> = ConcurrentHashMap()
+    var gatewayMap: MutableMap<String, WorkFlowGateway> = ConcurrentHashMap()
     var modelIdNodeMap: MutableMap<String, List<WorkFlowNode>> = ConcurrentHashMap()
 
     @PostConstruct
@@ -58,7 +57,7 @@ class NodeRelService {
                         lineMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowLine::class.java)
                     }
                     COMPONENT_TYPE_GATEWAY -> {
-                        gatewayMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowGateWay::class.java)
+                        gatewayMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowGateway::class.java)
                     }
                 }
 
@@ -84,14 +83,64 @@ class NodeRelService {
     /**
      * 获取下一个节点
      */
-    fun getNextNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
-        //todo impl
-        var curNode=curNode
-        var nextNode: WorkFlowNode? = null
-        while (nextNode != null) {
-            var lineId = curNode.sId
-//            if (nex`)
+    fun getNextNodesByGateWay(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
+        val workFlowLine = lineMap[curNode.sId]!!
+        //优先判定直达节点
+        if (nodeMap.containsKey(workFlowLine.sId)) {
+            return listOf(nodeMap[workFlowLine.sId]!!)
         }
+        return getNextNodesByGateWay(gatewayMap[workFlowLine.sId]!!, variables).apply {
+            if (this.isEmpty()) {
+                throw CustomException.neSlf4jStyle(
+                    "nodeId:{} name:{} can not find nextNodes by variables:{} !",
+                    curNode.id,
+                    JSONObject.toJSONString(variables)
+                )
+            }
+            for (nextNode in this) {
+                if (nextNode == curNode) {
+                    throw CustomException.neSlf4jStyle(
+                        "nodeId:{} name:{} 's exist nextNodes contain itself!",
+                        curNode.id,
+                        JSONObject.toJSONString(variables)
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    fun getNextNodesByGateWay(gateway: WorkFlowGateway, variables: Map<String, *>): List<WorkFlowNode> {
+
+        val ret = mutableListOf<WorkFlowNode>()
+        gateway.sIds.sort()
+        for (sId in gateway.sIds) {
+            val workFlowLine = lineMap[sId]!!
+            val nextComponentId = workFlowLine.sId;
+            //排他网关需要具有表达式校验
+            if (gateway.type == GatewayType.EXCLUSIVE_GATEWAY) {
+                if (eval(workFlowLine.flowConditionExpression!!, variables)) {
+                    if (nodeMap.containsKey(nextComponentId)) {
+                        ret.add(nodeMap[nextComponentId]!!)
+                    } else {
+                        ret.addAll(getNextNodesByGateWay(gatewayMap[nextComponentId]!!, variables))
+                    }
+                    //直接break 是因为是排他网关，仅取第一条满足的通路即可
+                    break
+                }
+            }
+            //并行网关
+            else {
+                if (nodeMap.containsKey(nextComponentId)) {
+                    ret.add(nodeMap[nextComponentId]!!)
+                } else {
+                    ret.addAll(getNextNodesByGateWay(gatewayMap[nextComponentId]!!, variables))
+                }
+            }
+        }
+        return ret;
     }
 
 

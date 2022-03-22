@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
+import com.zakl.workflow.core.WorkFlowState
 import lombok.AllArgsConstructor
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
@@ -54,6 +55,10 @@ class NodeTask(
      */
     var endTime: Date? = null
 
+    /**
+     * 流程状态
+     */
+    var workFlowState: Int = WorkFlowState.HANDLING.code
 
     /**
      * 该节点已经完成审批的数量

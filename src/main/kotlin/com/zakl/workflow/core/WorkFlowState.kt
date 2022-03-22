@@ -1,6 +1,6 @@
 package com.zakl.workflow.core
 
-enum class ProcessInstanceState(val code: Int) {
+enum class WorkFlowState(val code: Int) {
     /**
      * 审核状态
      * 0:未提交
@@ -16,11 +16,8 @@ enum class ProcessInstanceState(val code: Int) {
     HANDLING(1),
 
     //通过
-    PASSED(2),
-
-    //退回
-    REJECT(3),
-
+    DONE(2),
+    
     //未知
     UNKNOWN(4),
 
@@ -28,7 +25,7 @@ enum class ProcessInstanceState(val code: Int) {
     CLOSED(9);
 
     companion object {
-        fun getApprovalStatus(code: Int): ProcessInstanceState {
+        fun getApprovalStatus(code: Int): WorkFlowState {
             for (value in values()) {
                 if (value.code == code) {
                     return value
