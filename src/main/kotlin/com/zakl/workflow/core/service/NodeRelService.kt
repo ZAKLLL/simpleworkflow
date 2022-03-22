@@ -21,7 +21,7 @@ import javax.annotation.PostConstruct
  * @author ZhangJiaKui
  */
 
-private const val SERVICE_BEAN_NAME: String = "modelservice";
+private const val SERVICE_BEAN_NAME: String = "moderelservice";
 
 @Service(value = SERVICE_BEAN_NAME)
 @Transactional
