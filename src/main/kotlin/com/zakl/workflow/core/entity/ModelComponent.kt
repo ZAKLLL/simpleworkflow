@@ -24,7 +24,9 @@ class ModelComponent(
         const val tableName = "t_model_component"
     }
 
+    constructor() : this("", "", "", "") {
 
+    }
 
 
 }

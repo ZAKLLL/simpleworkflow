@@ -73,6 +73,10 @@ class IdentityTask(
      */
     var nextAssignValue: String? = null;
 
+    constructor() : this("", "", "", "") {
+
+    }
+
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)
     }

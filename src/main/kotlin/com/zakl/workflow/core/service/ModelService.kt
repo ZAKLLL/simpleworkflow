@@ -3,6 +3,7 @@ package com.zakl.workflow.core.service
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.zakl.workflow.core.modeldefine.ModelChecker
 import com.zakl.workflow.core.modeldefine.WorkFlowComponentBase
 import com.zakl.workflow.core.service.dto.ModelInfo
@@ -30,6 +31,11 @@ interface ModelService {
      */
     fun deleteModel(modelId: String)
 
+    /**
+     * 查询流程信息
+     */
+    fun getModelConfigs(page: Int, size: Int, deployStatus: Int): Page<ModelConfig>
+
 
 }
 
@@ -56,9 +62,10 @@ class ModelServiceImpl : ModelService {
                 modelId!!
             )
             model.tmpModel = modelInfo.sourModelInfo
+            model.name = modelInfo.name
             modelConfigMapper.updateById(model)
         } else {
-            model = ModelConfig(modelInfo.sourModelInfo);
+            model = ModelConfig(modelInfo.sourModelInfo, modelInfo.name);
             modelConfigMapper.insert(model)
         }
         modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model.id))
@@ -86,4 +93,11 @@ class ModelServiceImpl : ModelService {
         modelConfigMapper.deleteById(modelId)
     }
 
+    override fun getModelConfigs(page: Int, size: Int, deployStatus: Int): Page<ModelConfig> {
+        var queryWrapper: QueryWrapper<ModelConfig> = QueryWrapper<ModelConfig>()
+        if (deployStatus != -1) {
+            queryWrapper = queryWrapper.eq("idDeploy", deployStatus == 1)
+        }
+        return modelConfigMapper.selectPage(Page(page.toLong(), size.toLong()),queryWrapper)
+    }
 }

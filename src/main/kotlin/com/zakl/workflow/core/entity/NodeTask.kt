@@ -7,23 +7,19 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import com.zakl.workflow.core.WorkFlowState
-import lombok.AllArgsConstructor
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
 @TableName(value = NodeTask.tableName)
-@AllArgsConstructor
-class NodeTask(
+data class NodeTask(
     /**
      * 流程id
      */
     var processInstanceId: String,
-
     /**
      * 节点id
      */
     var nodeId: String,
-
     /**
      * 该节点任务分发的具体数量
      */
@@ -77,6 +73,9 @@ class NodeTask(
      */
     var variables: String = "{}"
 
+    constructor() : this("", "", 0, "") {
+
+    }
 
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)

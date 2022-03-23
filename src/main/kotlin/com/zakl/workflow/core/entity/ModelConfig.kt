@@ -20,7 +20,8 @@ import java.util.*
 @TableName(ModelConfig.tableName)
 @AllArgsConstructor
 class ModelConfig(
-    var tmpModel: String
+    var tmpModel: String,
+    var name: String
 ) : BasePersistentObject() {
     companion object {
         const val tableName = "t_model_config"
@@ -31,12 +32,17 @@ class ModelConfig(
     var releaseModel: String? = null
     var deployTime: Date? = null
     var isDeploy: Boolean = false
+
+
+    constructor() : this("", "") {
+
+    }
 }
 
 @Mapper
 interface ModelConfigMapper : BaseMapper<ModelConfig> {
 
-    @Update("update t_model_config set releaseModel=tmpModel where id =#{modelId}")
+    @Update("update t_model_config set releaseModel=tmpModel,deployTime=now(),updateTime=now() where id =#{modelId}")
     fun deployModel(@Param("modelId") modelId: String)
 
 }

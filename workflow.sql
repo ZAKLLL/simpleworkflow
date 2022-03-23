@@ -12,8 +12,8 @@ create table t_identity_task
     workFlowState     int                                 not null,
     variables         varchar(255)                        not null,
     nextAssignValue   varchar(255)                        null,
-    create_time       timestamp default CURRENT_TIMESTAMP not null,
-    update_time       timestamp default CURRENT_TIMESTAMP not null,
+    createTime       timestamp default CURRENT_TIMESTAMP not null,
+    updateTime       timestamp default CURRENT_TIMESTAMP not null,
     status            smallint  default 1                 not null,
     constraint t_identity_task_id_uindex
         unique (id)
@@ -24,10 +24,10 @@ create table t_model_component
     id            varchar(64)                         not null
         primary key,
     modelId       varchar(64)                         not null,
-    componentInfo varchar(64)                         not null comment '节点/网关/line信息',
+    componentInfo varchar(512)                         not null comment '节点/网关/line信息',
     componentType varchar(32)                         not null comment '组件类型: 节点/网关/line',
-    create_time   timestamp default CURRENT_TIMESTAMP not null,
-    update_time   timestamp default CURRENT_TIMESTAMP not null,
+    createTime   timestamp default CURRENT_TIMESTAMP not null,
+    updateTime   timestamp default CURRENT_TIMESTAMP not null,
     status        smallint  default 1                 not null,
     constraint t_model_component_id_uindex
         unique (id)
@@ -63,8 +63,8 @@ create table t_node_task
     doneCnt           int                                 null,
     nextAssignValue   varchar(255)                        null,
     variables         varchar(512)                        null,
-    create_time       timestamp default CURRENT_TIMESTAMP not null,
-    update_time       timestamp default CURRENT_TIMESTAMP not null,
+    createTime       timestamp default CURRENT_TIMESTAMP not null,
+    updateTime       timestamp default CURRENT_TIMESTAMP not null,
     status            smallint  default 1                 not null,
     constraint t_node_task_id_uindex
         unique (id)
@@ -81,8 +81,8 @@ create table t_process_instance
     modelId       varchar(64)                         not null,
     identityId    varchar(64)                         not null,
     variables     varchar(512)                        null,
-    create_time   timestamp default CURRENT_TIMESTAMP not null,
-    update_time   timestamp default CURRENT_TIMESTAMP not null,
+    createTime   timestamp default CURRENT_TIMESTAMP not null,
+    updateTime   timestamp default CURRENT_TIMESTAMP not null,
     status        smallint  default 1                 not null,
     constraint t_process_instance_id_uindex
         unique (id)

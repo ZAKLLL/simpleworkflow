@@ -10,6 +10,7 @@ data class ModelInfo(
     var lines: List<WorkFlowLine>,
     var gateways: List<WorkFlowGateway>,
     var sourModelInfo: String,
+    val name: String,
 )
 
 data class StartProcessParam(

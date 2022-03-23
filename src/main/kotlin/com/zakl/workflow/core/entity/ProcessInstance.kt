@@ -57,6 +57,10 @@ data class ProcessInstance(
         return JSONObject.parseObject(variables, Map::class.java)
     }
 
+    constructor() : this("", "", "") {
+
+    }
+
 }
 
 @Mapper
