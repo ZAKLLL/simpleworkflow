@@ -38,12 +38,12 @@ class ModelChecker private constructor(
     /**
      * 具有 到达 end节点通路 的节点Id
      */
-    private var toEndSet: Set<String> = HashSet()
+    private var toEndSet: MutableSet<String> = HashSet()
 
     /**
      * 需要检查是否拥有是否存在不能结束的环
      */
-    private var needToCheckCycles: List<Set<String>> = ArrayList();
+    private var needToCheckCycles: MutableList<Set<String>> = ArrayList();
 
 
     /**
@@ -111,18 +111,18 @@ class ModelChecker private constructor(
     /**
      * 节点检查
      */
-    private fun nodeCheck(node: WorkFlowNode, vis: Set<String>) {
+    private fun nodeCheck(node: WorkFlowNode, vis: MutableSet<String>) {
         //如果出现环路,环路上必须出现排他网关，且此排他网关必须拥有具备通向end的路径
         if (vis.contains(node.id)) {
-            needToCheckCycles.plus(vis)
+            needToCheckCycles.add(vis)
             return
         } else {
-            vis.plus(node.id)
+            vis.add(node.id)
         }
         when (node.type) {
             //end节点需要校验是否为
             NodeType.END_NODE -> {
-                toEndSet.plus(vis)
+                toEndSet.addAll(vis)
                 if (StrUtil.isNotEmpty(node.sId)) {
                     throw ModelDefineException("请检查 结束节点不应包含出路!")
                 }
@@ -138,12 +138,12 @@ class ModelChecker private constructor(
     /**
      * 连接线检查
      */
-    private fun lineCheck(line: WorkFlowLine, vis: Set<String>) {
+    private fun lineCheck(line: WorkFlowLine, vis: MutableSet<String>) {
         if (vis.contains(line.id)) {
-            needToCheckCycles.plus(vis)
+            needToCheckCycles.add(vis)
             return
         } else {
-            vis.plus(line.id)
+            vis.add(line.id)
         }
 
         if (StrUtil.isBlank(line.sId)) {
@@ -158,15 +158,29 @@ class ModelChecker private constructor(
     }
 
     /**
+     * 环路检查
+     */
+    private fun cycleCheck() {
+        if (needToCheckCycles.isEmpty()) return
+        for (needToCheckCycle in needToCheckCycles) {
+            needToCheckCycle.any { i -> toEndSet.contains(i) }.run {
+                if (!this) {
+                    throw ModelDefineException("请检查是否存在不可结束的环路!")
+                }
+            }
+        }
+    }
+
+    /**
      * 路由检查
      */
-    private fun gateWayCheck(gateWay: WorkFlowGateway, vis: Set<String>) {
+    private fun gateWayCheck(gateWay: WorkFlowGateway, vis: MutableSet<String>) {
 
         if (vis.contains(gateWay.id)) {
-            needToCheckCycles.plus(vis)
+            needToCheckCycles.add(vis)
             return
         } else {
-            vis.plus(gateWay.id)
+            vis.add(gateWay.id)
         }
         when (gateWay.type) {
             GatewayType.EXCLUSIVE_GATEWAY -> {
@@ -191,19 +205,4 @@ class ModelChecker private constructor(
             }
         }
     }
-
-    /**
-     * 环路检查
-     */
-    private fun cycleCheck() {
-        for (needToCheckCycle in needToCheckCycles) {
-            for (nodeId in needToCheckCycle) {
-                if (toEndSet.contains(nodeId)) {
-                    return
-                }
-            }
-        }
-        throw ModelDefineException("请检查是否存在不可结束的环路!")
-    }
-
 }

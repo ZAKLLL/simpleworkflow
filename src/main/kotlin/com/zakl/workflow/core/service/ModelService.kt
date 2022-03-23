@@ -55,10 +55,10 @@ class ModelServiceImpl : ModelService {
                 "modeId: {} can not found!",
                 modelId!!
             )
-            model.tmpModel = modelInfo.sourModeInfo
+            model.tmpModel = modelInfo.sourModelInfo
             modelConfigMapper.updateById(model)
         } else {
-            model = ModelConfig(modelInfo.sourModeInfo);
+            model = ModelConfig(modelInfo.sourModelInfo);
             modelConfigMapper.insert(model)
         }
         modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model.id))

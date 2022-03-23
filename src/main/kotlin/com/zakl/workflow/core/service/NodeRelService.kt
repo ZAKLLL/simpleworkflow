@@ -38,8 +38,8 @@ class NodeRelService {
     var lineMap: MutableMap<String, WorkFlowLine> = ConcurrentHashMap()
     var gatewayMap: MutableMap<String, WorkFlowGateway> = ConcurrentHashMap()
     var modelIdNodeMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
-    var modelIdGatewayMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
-    var modelIdLineMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
+    var modelIdGatewayMap: MutableMap<String, MutableList<WorkFlowGateway>> = ConcurrentHashMap()
+    var modelIdLineMap: MutableMap<String, MutableList<WorkFlowLine>> = ConcurrentHashMap()
 
     @PostConstruct
     fun init() {
@@ -75,16 +75,16 @@ class NodeRelService {
             when (component.componentType) {
                 COMPONENT_TYPE_NODE -> {
                     nodeMap[component.id] = JSONObject.parseObject(component.componentInfo, WorkFlowNode::class.java)
-                    modelIdNodeMap.computeIfAbsent(modelId) { ArrayList() }.plus(nodeMap[component.id])
+                    modelIdNodeMap.computeIfAbsent(modelId) { ArrayList() }.add(nodeMap[component.id]!!)
                 }
                 COMPONENT_TYPE_LINE -> {
                     lineMap[component.id] = JSONObject.parseObject(component.componentInfo, WorkFlowLine::class.java)
-                    modelIdLineMap.computeIfAbsent(modelId) { ArrayList() }.plus(lineMap[component.id])
+                    modelIdLineMap.computeIfAbsent(modelId) { ArrayList() }.add(lineMap[component.id]!!)
                 }
                 COMPONENT_TYPE_GATEWAY -> {
                     gatewayMap[component.id] =
                         JSONObject.parseObject(component.componentInfo, WorkFlowGateway::class.java)
-                    modelIdGatewayMap.computeIfAbsent(modelId) { ArrayList() }.plus(gatewayMap[component.id])
+                    modelIdGatewayMap.computeIfAbsent(modelId) { ArrayList() }.add(gatewayMap[component.id]!!)
                 }
             }
 

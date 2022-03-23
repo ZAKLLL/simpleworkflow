@@ -9,5 +9,12 @@ data class ModelInfo(
     var nodes: List<WorkFlowNode>,
     var lines: List<WorkFlowLine>,
     var gateways: List<WorkFlowGateway>,
-    var sourModeInfo: String,
+    var sourModelInfo: String,
+)
+
+data class StartProcessParam(
+    var modelId: String,
+    var identityId: String,
+    var variables: Map<String, *>,
+    var assignValue: String
 )

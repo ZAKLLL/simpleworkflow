@@ -36,7 +36,7 @@ interface ProcessService {
     /**
      * 执行任务
      */
-    fun completeTask(identityTask: IdentityTask, identityId: String, variables: Map<String, *>, assignValue: String)
+    fun completeTask(identityTaskId: String, variables: Map<String, *>, assignValue: String)
 
     /**
      * 撤回流程
@@ -82,7 +82,7 @@ class ProcessServiceImpl : ProcessService {
         //将开始节点作为任务分发给申请人
         val curIdentityTask = distributeIdentityTask(processInstance.id!!, startNode, listOf(identityId))[0]
 
-        completeTask(curIdentityTask, identityId, variables, assignValue)
+        completeTask(curIdentityTask.id!!, variables, assignValue)
 
     }
 
@@ -94,13 +94,13 @@ class ProcessServiceImpl : ProcessService {
     }
 
     override fun completeTask(
-        identityTask: IdentityTask, identityId: String, variables: Map<String, *>, assignValue: String
+        identityTaskId: String, variables: Map<String, *>, assignValue: String
     ) {
+        val identityTask = identityTaskMapper.selectById(identityTaskId)
         val curNode = nodeRelService.getNode(identityTask.nodeId)
-
         identityTask.also {
             it.endTime = Date()
-            it.workFlowState=WorkFlowState.DONE.code
+            it.workFlowState = WorkFlowState.DONE.code
             it.comment = variables[APPROVAL_COMMENT] as String?
             it.nextAssignValue = assignValue
             it.variables = JSON.toJSONString(variables)

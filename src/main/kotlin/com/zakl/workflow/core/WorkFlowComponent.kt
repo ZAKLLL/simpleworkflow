@@ -35,14 +35,14 @@ class WorkFlowNode constructor(
  */
 class WorkFlowLine constructor(
     id: String,
-    name: String,
+    name: String?,
     var pId: String?,
     var sId: String?,
     //当父节点为排他网关时,次字段有效
     var exclusiveOrder: Int = 0,
     //如果为null
     var flowConditionExpression: String?
-) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_LINE)
+) : WorkFlowComponentBase(id, name ?: "", componentType = Constant.COMPONENT_TYPE_LINE)
 
 /**
  * 网关
