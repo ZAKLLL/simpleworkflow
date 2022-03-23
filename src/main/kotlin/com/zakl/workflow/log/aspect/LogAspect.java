@@ -36,7 +36,6 @@ import java.util.Enumeration;
 @Slf4j
 public class LogAspect {
 
-    private static final String AUTH_TOKEN = "auth-token";
 
     @Pointcut("@annotation(com.southsmart.microserver.log.annotation.OperationLog)")
     public void operationLog() {

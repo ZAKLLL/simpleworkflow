@@ -6,9 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.common.combineVariablesToStr
 import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
-import com.zakl.workflow.core.NodeType
+import com.zakl.workflow.core.modeldefine.NodeType
 import com.zakl.workflow.core.WorkFlowState
-import com.zakl.workflow.core.WorkFlowNode
+import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import com.zakl.workflow.exception.NodeIdentityAssignException
@@ -36,12 +36,12 @@ interface ProcessService {
     /**
      * 执行任务
      */
-    fun completeTask(identityTaskId: String, variables: Map<String, *>, assignValue: String)
+    fun completeIdentityTask(identityTaskId: String, variables: Map<String, *>, assignValue: String)
 
     /**
      * 撤回流程
      */
-    fun recallTask(processInstanceId: String)
+    fun recallProcessInstance(processInstanceId: String)
 
 
 }
@@ -82,7 +82,7 @@ class ProcessServiceImpl : ProcessService {
         //将开始节点作为任务分发给申请人
         val curIdentityTask = distributeIdentityTask(processInstance.id!!, startNode, listOf(identityId))[0]
 
-        completeTask(curIdentityTask.id!!, variables, assignValue)
+        completeIdentityTask(curIdentityTask.id!!, variables, assignValue)
 
     }
 
@@ -93,7 +93,7 @@ class ProcessServiceImpl : ProcessService {
         return identityTaskMapper.selectList(QueryWrapper<IdentityTask>().eq("identityId", identityId))
     }
 
-    override fun completeTask(
+    override fun completeIdentityTask(
         identityTaskId: String, variables: Map<String, *>, assignValue: String
     ) {
         val identityTask = identityTaskMapper.selectById(identityTaskId)
@@ -184,7 +184,7 @@ class ProcessServiceImpl : ProcessService {
     }
 
 
-    override fun recallTask(processInstanceId: String) {
+    override fun recallProcessInstance(processInstanceId: String) {
         TODO("Not yet implemented")
     }
 

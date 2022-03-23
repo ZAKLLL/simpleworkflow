@@ -3,8 +3,8 @@ package com.zakl.workflow.core
 import com.zakl.workflow.common.Result
 import com.zakl.workflow.common.ResultUtil
 import com.zakl.workflow.core.service.ModelService
-import com.zakl.workflow.core.service.NodeRelService
 import com.zakl.workflow.core.service.ProcessService
+import com.zakl.workflow.core.service.dto.CompleteIdentityTaskParam
 import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.core.service.dto.StartProcessParam
 import io.swagger.annotations.Api
@@ -58,8 +58,17 @@ class ProcessController {
         return ResultUtil.success(processService.getIdentityTasks(identityId))
     }
 
-    fun completeTask(){
+    @PostMapping("/completeIdentityTask")
+    fun completeIdentityTask(completeIdentityTaskParam: CompleteIdentityTaskParam): Result {
+        val (identityTaskId, variables, assignValue) = completeIdentityTaskParam
+        processService.completeIdentityTask(identityTaskId, variables, assignValue)
+        return ResultUtil.success()
+    }
 
+    @GetMapping("/recallProcessInstance/{processInstanceId}")
+    fun recallProcessInstance(processInstanceId: String): Result {
+        processService.recallProcessInstance(processInstanceId)
+        return ResultUtil.success()
     }
 
 

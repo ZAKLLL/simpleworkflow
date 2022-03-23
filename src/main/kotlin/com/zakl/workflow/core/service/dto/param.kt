@@ -1,8 +1,8 @@
 package com.zakl.workflow.core.service.dto
 
-import com.zakl.workflow.core.WorkFlowGateway
-import com.zakl.workflow.core.WorkFlowLine
-import com.zakl.workflow.core.WorkFlowNode
+import com.zakl.workflow.core.modeldefine.WorkFlowGateway
+import com.zakl.workflow.core.modeldefine.WorkFlowLine
+import com.zakl.workflow.core.modeldefine.WorkFlowNode
 
 data class ModelInfo(
     var modelId: String? = null,
@@ -17,4 +17,8 @@ data class StartProcessParam(
     var identityId: String,
     var variables: Map<String, *>,
     var assignValue: String
+)
+
+data class CompleteIdentityTaskParam(
+    var identityTaskId: String, var variables: Map<String, *>, var assignValue: String
 )

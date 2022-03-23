@@ -8,6 +8,7 @@ import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_LINE
 import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_NODE
 import com.zakl.workflow.common.Constant.Companion.WHERE_IN_PLACEHOLDER_STR
 import com.zakl.workflow.core.entity.*
+import com.zakl.workflow.core.modeldefine.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service

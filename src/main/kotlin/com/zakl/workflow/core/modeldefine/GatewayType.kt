@@ -1,4 +1,4 @@
-package com.zakl.workflow.core
+package com.zakl.workflow.core.modeldefine
 
 /**
  * @classname GateWayType

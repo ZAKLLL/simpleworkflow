@@ -3,8 +3,8 @@ package com.zakl.workflow.core.service
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.zakl.workflow.core.ModelChecker
-import com.zakl.workflow.core.WorkFlowComponentBase
+import com.zakl.workflow.core.modeldefine.ModelChecker
+import com.zakl.workflow.core.modeldefine.WorkFlowComponentBase
 import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
