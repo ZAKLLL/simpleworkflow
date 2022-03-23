@@ -2,14 +2,15 @@ package com.zakl.workflow.core.service
 
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
-import com.zakl.workflow.core.*
 import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_GATEWAY
 import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_LINE
 import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_NODE
 import com.zakl.workflow.common.Constant.Companion.WHERE_IN_PLACEHOLDER_STR
 import com.zakl.workflow.core.entity.*
+import com.zakl.workflow.core.eval
 import com.zakl.workflow.core.modeldefine.*
 import com.zakl.workflow.exception.CustomException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,6 +29,8 @@ private const val SERVICE_BEAN_NAME: String = "noderelservice";
 @Service(value = SERVICE_BEAN_NAME)
 @Transactional
 class NodeRelService {
+
+    val log = LoggerFactory.getLogger(this.javaClass)
 
     @Autowired
     lateinit var modelComponentMapper: ModelComponentMapper
@@ -55,9 +58,10 @@ class NodeRelService {
             modelComponentMapper.selectList(QueryWrapper<ModelComponent>().`in`("modelId", deployModelIds))
         //先按照modelId groupBy
         val modeIdComponentsMap = modelComponents.groupBy { i -> i.modelId }
-        for (modeId in modeIdComponentsMap.keys) {
-            val components = modeIdComponentsMap[modeId]!!
-            initModelComponents(modeId, components)
+        for (modelId in modeIdComponentsMap.keys) {
+            val components = modeIdComponentsMap[modelId]!!
+            initModelComponents(modelId, components)
+            log.info("加载 modelId{} 完毕",modelId)
         }
     }
 
@@ -176,7 +180,7 @@ class NodeRelService {
      * （多人会签需要校验通过比例）
      */
     fun checkIfNodeCanComplete(nodeTask: NodeTask): Boolean {
-        val workFlowNode = nodeMap[nodeTask.id]!!
+        val workFlowNode = nodeMap[nodeTask.nodeId]!!
         if (workFlowNode.type == NodeType.SINGLE_USER_TASK_NODE) {
             return nodeTask.doneCnt == 1
         }

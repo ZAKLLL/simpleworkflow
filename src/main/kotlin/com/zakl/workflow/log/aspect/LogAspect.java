@@ -2,7 +2,6 @@ package com.zakl.workflow.log.aspect;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.lang.UUID;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.zakl.workflow.log.annotation.OperationLog;
 import com.zakl.workflow.log.constant.LogItemNames;
@@ -12,7 +11,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
@@ -70,7 +72,6 @@ public class LogAspect {
             String requestMsgLog = String.format("  IP: %s , 调用接口: %s ,请求类型: %s ,耗时: %d ms",
                     requestInfo.requestIp, requestInfo.requestUrl, requestInfo.requestType, diffTime);
             log.info(requestMsgLog);
-
             logToMDC(requestInfo, requestMsgLog);
 
             logRequestParamOrBody(joinPoint, joinPoint.getArgs(), req);

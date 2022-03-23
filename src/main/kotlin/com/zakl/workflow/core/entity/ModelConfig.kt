@@ -42,7 +42,7 @@ class ModelConfig(
 @Mapper
 interface ModelConfigMapper : BaseMapper<ModelConfig> {
 
-    @Update("update t_model_config set releaseModel=tmpModel,deployTime=now(),updateTime=now() where id =#{modelId}")
+    @Update("update t_model_config set releaseModel=tmpModel,deployTime=now(),updateTime=now(),isDeploy=1 where id =#{modelId}")
     fun deployModel(@Param("modelId") modelId: String)
 
 }

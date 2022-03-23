@@ -21,5 +21,7 @@ data class StartProcessParam(
 )
 
 data class CompleteIdentityTaskParam(
-    var identityTaskId: String, var variables: Map<String, *>, var assignValue: String
+    var identityTaskId: String,
+    var variables: Map<String, *>,
+    var assignValue: String? //结束节点不需要指定人
 )

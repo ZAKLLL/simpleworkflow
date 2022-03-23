@@ -12,6 +12,7 @@ import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import com.zakl.workflow.exception.NodeIdentityAssignException
+import com.zakl.workflow.exception.ProcessException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,7 +37,7 @@ interface ProcessService {
     /**
      * 执行任务
      */
-    fun completeIdentityTask(identityTaskId: String, variables: Map<String, *>, assignValue: String)
+    fun completeIdentityTask(identityTaskId: String, variables: Map<String, *>, assignValue: String?)
 
     /**
      * 撤回流程
@@ -94,9 +95,12 @@ class ProcessServiceImpl : ProcessService {
     }
 
     override fun completeIdentityTask(
-        identityTaskId: String, variables: Map<String, *>, assignValue: String
+        identityTaskId: String, variables: Map<String, *>, assignValue: String?
     ) {
         val identityTask = identityTaskMapper.selectById(identityTaskId)
+        if (identityTask.endTime!=null){
+            throw ProcessException("identityTaskId $identityTaskId 任务节点已经被执行!");
+        }
         val curNode = nodeRelService.getNode(identityTask.nodeId)
         identityTask.also {
             it.endTime = Date()
@@ -172,7 +176,7 @@ class ProcessServiceImpl : ProcessService {
     private fun checkIfProcessInstanceCompleted(nodeTask: NodeTask) {
         val processInstance = processInstanceMapper.selectById(nodeTask.processInstanceId)
         nodeTaskMapper.selectList(
-            QueryWrapper<NodeTask?>().isNotNull("endTime").eq("processInstanceId", processInstance.id)
+            QueryWrapper<NodeTask?>().isNull("endTime").eq("processInstanceId", processInstance.id)
         ).run {
             //不存在未完成的任务节点
             if (this.isEmpty()) {

@@ -69,7 +69,7 @@ class ProcessController {
     }
 
     @PostMapping("/completeIdentityTask")
-    fun completeIdentityTask(completeIdentityTaskParam: CompleteIdentityTaskParam): Result {
+    fun completeIdentityTask(@RequestBody completeIdentityTaskParam: CompleteIdentityTaskParam): Result {
         val (identityTaskId, variables, assignValue) = completeIdentityTaskParam
         processService.completeIdentityTask(identityTaskId, variables, assignValue)
         return ResultUtil.success()
