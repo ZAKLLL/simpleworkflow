@@ -5,11 +5,11 @@ import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.common.combineVariablesToStr
 import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
-import com.zakl.workflow.core.Constant.Companion.APPROVAL_COMMENT
+import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
 import com.zakl.workflow.core.NodeType
 import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.WorkFlowNode
-import com.zakl.workflow.entity.*
+import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import com.zakl.workflow.exception.NodeIdentityAssignException
 import org.springframework.beans.factory.annotation.Autowired

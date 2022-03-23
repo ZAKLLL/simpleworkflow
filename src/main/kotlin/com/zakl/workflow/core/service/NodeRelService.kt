@@ -3,10 +3,11 @@ package com.zakl.workflow.core.service
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.core.*
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_GATEWAY
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_LINE
-import com.zakl.workflow.core.Constant.Companion.COMPONENT_TYPE_NODE
-import com.zakl.workflow.entity.*
+import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_GATEWAY
+import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_LINE
+import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_NODE
+import com.zakl.workflow.common.Constant.Companion.WHERE_IN_PLACEHOLDER_STR
+import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -21,7 +22,7 @@ import javax.annotation.PostConstruct
  * @author ZhangJiaKui
  */
 
-private const val SERVICE_BEAN_NAME: String = "moderelservice";
+private const val SERVICE_BEAN_NAME: String = "noderelservice";
 
 @Service(value = SERVICE_BEAN_NAME)
 @Transactional
@@ -36,32 +37,57 @@ class NodeRelService {
     var nodeMap: MutableMap<String, WorkFlowNode> = ConcurrentHashMap()
     var lineMap: MutableMap<String, WorkFlowLine> = ConcurrentHashMap()
     var gatewayMap: MutableMap<String, WorkFlowGateway> = ConcurrentHashMap()
-    var modelIdNodeMap: MutableMap<String, List<WorkFlowNode>> = ConcurrentHashMap()
+    var modelIdNodeMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
+    var modelIdGatewayMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
+    var modelIdLineMap: MutableMap<String, MutableList<WorkFlowNode>> = ConcurrentHashMap()
 
     @PostConstruct
     fun init() {
         val deployModelIds =
             modelConfigMapper.selectList(QueryWrapper<ModelConfig>().eq("isDeploy", true)).map { i -> i.id }
+                .toMutableList().also {
+                    if (it.isEmpty()) {
+                        it.add(WHERE_IN_PLACEHOLDER_STR)
+                    }
+                }
         val modelComponents =
-            modelComponentMapper.selectList(QueryWrapper<ModelComponent>().`in`("modeId", deployModelIds))
+            modelComponentMapper.selectList(QueryWrapper<ModelComponent>().`in`("modelId", deployModelIds))
         //先按照modelId groupBy
         val modeIdComponentsMap = modelComponents.groupBy { i -> i.modelId }
         for (modeId in modeIdComponentsMap.keys) {
-            for (i in modeIdComponentsMap[modeId]!!) {
-                when (i.componentType) {
-                    COMPONENT_TYPE_NODE -> {
-                        nodeMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowNode::class.java)
-                        modelIdNodeMap.computeIfAbsent(i.modelId) { ArrayList() }.plus(nodeMap[i.id])
-                    }
-                    COMPONENT_TYPE_LINE -> {
-                        lineMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowLine::class.java)
-                    }
-                    COMPONENT_TYPE_GATEWAY -> {
-                        gatewayMap[i.id] = JSONObject.parseObject(i.componentInfo, WorkFlowGateway::class.java)
-                    }
-                }
+            val components = modeIdComponentsMap[modeId]!!
+            initModelComponents(modeId, components)
+        }
+    }
 
+    fun initModelComponents(modelId: String, components: List<ModelComponent>) {
+        //先去除掉之前的
+        modelIdLineMap.remove(modelId).run {
+            this?.forEach { i -> lineMap.remove(i.id) }
+        }
+        modelIdGatewayMap.remove(modelId).run {
+            this?.forEach { i -> gatewayMap.remove(i.id) }
+        }
+        modelIdNodeMap.remove(modelId).run {
+            this?.forEach { i -> nodeMap.remove(i.id) }
+        }
+        for (component in components) {
+            when (component.componentType) {
+                COMPONENT_TYPE_NODE -> {
+                    nodeMap[component.id] = JSONObject.parseObject(component.componentInfo, WorkFlowNode::class.java)
+                    modelIdNodeMap.computeIfAbsent(modelId) { ArrayList() }.plus(nodeMap[component.id])
+                }
+                COMPONENT_TYPE_LINE -> {
+                    lineMap[component.id] = JSONObject.parseObject(component.componentInfo, WorkFlowLine::class.java)
+                    modelIdLineMap.computeIfAbsent(modelId) { ArrayList() }.plus(lineMap[component.id])
+                }
+                COMPONENT_TYPE_GATEWAY -> {
+                    gatewayMap[component.id] =
+                        JSONObject.parseObject(component.componentInfo, WorkFlowGateway::class.java)
+                    modelIdGatewayMap.computeIfAbsent(modelId) { ArrayList() }.plus(gatewayMap[component.id])
+                }
             }
+
         }
     }
 

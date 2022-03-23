@@ -1,4 +1,4 @@
-package com.zakl.workflow.core
+package com.zakl.workflow.common
 
 /**
  * @classname NodeConstant
@@ -42,6 +42,14 @@ class Constant {
          */
         const val APPROVAL_COMMENT = "__APPROVAL_COMMENT";
 
+        const val WHERE_IN_PLACEHOLDER_STR = "_！@#%@#……%！@@！@DASDqwedc2652548&_";
+
+        const val RESULT_STATUS_SUCCESS = 0
+        const val RESULT_STATUS_FAIL = 1
+        const val RESULT_STATUS_ERROR = 2
+        const val RESULT_MESSAGE_SUCCESS = "操作成功！"
+        const val RESULT_MESSAGE_FAIL = "操作失败！"
+        const val RESULT_MESSAGE_ERROR = "程序出错！"
     }
 
 

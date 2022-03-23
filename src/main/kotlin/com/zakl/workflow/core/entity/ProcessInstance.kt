@@ -1,4 +1,4 @@
-package com.zakl.workflow.entity
+package com.zakl.workflow.core.entity
 
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.annotation.IdType
@@ -6,46 +6,40 @@ import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
-import com.zakl.workflow.core.WorkFlowState
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
-@TableName(value = IdentityTask.tableName)
-class IdentityTask(
+@TableName(value = ProcessInstance.tableName)
+data class ProcessInstance(
+
+
     /**
-     * 流程id
+     * 模板id
      */
-    var processInstanceId: String,
-
-
-    /**
-     * 节点id
-     */
-    var nodeId: String,
+    var modelId: String,
 
     /**
-     * 节点任务Id
-     */
-    var nodeTaskId: String,
-
-    /**
-     * 任务拥有者id
+     * identityId
      */
     var identityId: String,
 
-    ) : BasePersistentObject() {
+    /**
+     * 实例共享变量
+     */
+    var variables: String
+
+) : BasePersistentObject() {
     companion object {
-        const val tableName = "t_user_task"
+        const val tableName = "t_process_instance"
     }
 
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
 
-
     /**
-     * comment
+     * 流程状态
      */
-    var comment: String? = null
+    var instanceState: Int = 0
 
 
     /**
@@ -58,27 +52,14 @@ class IdentityTask(
      */
     var endTime: Date? = null
 
-    /**
-     * 流程状态
-     */
-    var workFlowState: Int = WorkFlowState.HANDLING.code
-
-    /**
-     * identity 变量
-     */
-    var variables: String? = "{}"
-
-    /**
-     * 指定identity Id
-     */
-    var nextAssignValue: String? = null;
 
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)
     }
+
 }
 
 @Mapper
-interface IdentityTaskMapper : BaseMapper<IdentityTask> {
+interface ProcessInstanceMapper : BaseMapper<ProcessInstance> {
 
 }

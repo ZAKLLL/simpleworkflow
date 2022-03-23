@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8092
 
 spring:
   datasource:
@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/zaklworkflow?serverTimezone=UTC&characterEncoding=utf-8
     username: root
-    password: 123456
+    password: ZJK15626933724
 
   redis:
     host: 127.0.0.1

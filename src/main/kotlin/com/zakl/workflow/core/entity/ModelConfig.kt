@@ -1,4 +1,4 @@
-package com.zakl.workflow.entity
+package com.zakl.workflow.core.entity
 
 import com.baomidou.mybatisplus.annotation.IdType
 import com.baomidou.mybatisplus.annotation.TableId
@@ -36,7 +36,7 @@ class ModelConfig(
 @Mapper
 interface ModelConfigMapper : BaseMapper<ModelConfig> {
 
-    @Update("update t_model_config set releaseModel=tmpModel where modelId =#{modelId}")
+    @Update("update t_model_config set releaseModel=tmpModel where id =#{modelId}")
     fun deployModel(@Param("modelId") modelId: String)
 
 }

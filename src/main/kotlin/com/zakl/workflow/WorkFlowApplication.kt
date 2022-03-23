@@ -7,7 +7,7 @@ import org.springframework.cache.annotation.CacheConfig
 import org.springframework.cache.annotation.EnableCaching
 
 @SpringBootApplication
-@MapperScan("com.zakl.workflow.entity")
+@MapperScan("com.zakl.workflow.core.entity")
 @EnableCaching
 class WorkFlowApplication
 

@@ -1,5 +1,7 @@
 package com.zakl.workflow.core
 
+import com.zakl.workflow.common.Constant
+
 /**
  * @classname Node
  * @description TODO
@@ -10,7 +12,6 @@ package com.zakl.workflow.core
 open class WorkFlowComponentBase(
     var id: String,
     var name: String,
-    var locationInfo: String,
     var componentType: String
 )
 
@@ -20,7 +21,6 @@ open class WorkFlowComponentBase(
 class WorkFlowNode constructor(
     id: String,
     name: String,
-    locationInfo: String,
     var type: NodeType,
     var pid: String?,
     var sId: String?,
@@ -28,7 +28,7 @@ class WorkFlowNode constructor(
      * 多人会签通过比例(默认为1)
      */
     var mutliCompleteRatio: Double? = 1.0
-) : WorkFlowComponentBase(id, name, locationInfo, componentType = Constant.COMPONENT_TYPE_NODE)
+) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_NODE)
 
 /**
  * 工作流路
@@ -36,14 +36,13 @@ class WorkFlowNode constructor(
 class WorkFlowLine constructor(
     id: String,
     name: String,
-    locationInfo: String,
     var pId: String?,
     var sId: String?,
     //当父节点为排他网关时,次字段有效
     var exclusiveOrder: Int = 0,
     //如果为null
     var flowConditionExpression: String?
-) : WorkFlowComponentBase(id, name, locationInfo, componentType = Constant.COMPONENT_TYPE_LINE)
+) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_LINE)
 
 /**
  * 网关
@@ -51,10 +50,7 @@ class WorkFlowLine constructor(
 class WorkFlowGateway constructor(
     id: String,
     name: String,
-    locationInfo: String,
-
     var type: GatewayType,
-
     /**
      * 入路id
      */
@@ -65,4 +61,4 @@ class WorkFlowGateway constructor(
      */
     var sIds: Array<String>,
 
-) : WorkFlowComponentBase(id, name, locationInfo, componentType = Constant.COMPONENT_TYPE_GATEWAY)
+    ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)

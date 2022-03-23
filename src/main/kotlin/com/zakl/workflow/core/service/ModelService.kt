@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.core.ModelChecker
 import com.zakl.workflow.core.WorkFlowComponentBase
 import com.zakl.workflow.core.service.dto.ModelInfo
-import com.zakl.workflow.entity.*
+import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -18,7 +18,7 @@ interface ModelService {
     /**
      * 更新model
      */
-    fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo)
+    fun insertOrUpdateConfig(modelInfo: ModelInfo)
 
     /**
      * 部署流程
@@ -43,20 +43,22 @@ class ModelServiceImpl : ModelService {
     @Autowired
     lateinit var modelConfigMapper: ModelConfigMapper
 
+    @Autowired
+    lateinit var nodeRelService: NodeRelService
 
-    override fun insertOrUpdateConfig(modelId: String?, modelInfo: ModelInfo) {
+    override fun insertOrUpdateConfig(modelInfo: ModelInfo) {
+        val modelId = modelInfo.modelId
         ModelChecker.modelCheck(modelInfo)
-
         val model: ModelConfig
         if (StrUtil.isNotBlank(modelId)) {
             model = modelConfigMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle(
                 "modeId: {} can not found!",
                 modelId!!
             )
-            model.tmpModel = JSON.toJSONString(modelInfo)
+            model.tmpModel = modelInfo.sourModeInfo
             modelConfigMapper.updateById(model)
         } else {
-            model = ModelConfig(JSON.toJSONString(modelInfo));
+            model = ModelConfig(modelInfo.sourModeInfo);
             modelConfigMapper.insert(model)
         }
         modelComponentMapper.delete(QueryWrapper<ModelComponent>().eq("modelId", model.id))
@@ -74,6 +76,10 @@ class ModelServiceImpl : ModelService {
 
     override fun deployModel(modelId: String) {
         modelConfigMapper.deployModel(modelId)
+        nodeRelService.initModelComponents(
+            modelId,
+            modelComponentMapper.selectList(QueryWrapper<ModelComponent>().eq("modelId", modelId))
+        )
     }
 
     override fun deleteModel(modelId: String) {

@@ -1,4 +1,4 @@
-package com.zakl.workflow.entity
+package com.zakl.workflow.core.entity
 
 import com.alibaba.fastjson.JSONObject
 import com.baomidou.mybatisplus.annotation.IdType
@@ -7,17 +7,16 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import com.zakl.workflow.core.WorkFlowState
-import lombok.AllArgsConstructor
 import org.apache.ibatis.annotations.Mapper
 import java.util.*
 
-@TableName(value = NodeTask.tableName)
-@AllArgsConstructor
-class NodeTask(
+@TableName(value = IdentityTask.tableName)
+class IdentityTask(
     /**
      * 流程id
      */
     var processInstanceId: String,
+
 
     /**
      * 节点id
@@ -25,24 +24,28 @@ class NodeTask(
     var nodeId: String,
 
     /**
-     * 该节点任务分发的具体数量
+     * 节点任务Id
      */
-    var identityTaskCnt: Int,
-
+    var nodeTaskId: String,
 
     /**
-     * 当前节点指定人(>=1)
-     * identityId1;identityId2;IdentityId3
+     * 任务拥有者id
      */
-    var curIdentityIds: String,
+    var identityId: String,
 
     ) : BasePersistentObject() {
     companion object {
-        const val tableName = "t_node_task"
+        const val tableName = "t_identity_task"
     }
 
     @TableId(type = IdType.ASSIGN_UUID)
     var id: String? = null
+
+
+    /**
+     * comment
+     */
+    var comment: String? = null
 
 
     /**
@@ -61,31 +64,21 @@ class NodeTask(
     var workFlowState: Int = WorkFlowState.HANDLING.code
 
     /**
-     * 该节点已经完成审批的数量
+     * identity 变量
      */
-    var doneCnt: Int = 0
-
+    var variables: String? = "{}"
 
     /**
-     * 下个节点
-     * nodeId1:identityId1;nodeId2:identityId2;
+     * 指定identity Id
      */
-    var nextAssignValue: String? = null
-
-    /**
-     * 实例节点共享变量
-     */
-    var variables: String = "{}"
-
+    var nextAssignValue: String? = null;
 
     fun getVariablesMap(): Map<*, *> {
         return JSONObject.parseObject(variables, Map::class.java)
     }
-
-
 }
 
 @Mapper
-interface NodeTaskMapper : BaseMapper<NodeTask> {
+interface IdentityTaskMapper : BaseMapper<IdentityTask> {
 
 }
