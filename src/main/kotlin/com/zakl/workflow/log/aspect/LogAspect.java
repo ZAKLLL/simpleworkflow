@@ -37,11 +37,11 @@ import java.util.Enumeration;
 public class LogAspect {
 
 
-    @Pointcut("@annotation(com.southsmart.microserver.log.annotation.OperationLog)")
+    @Pointcut("@annotation(com.zakl.workflow.log.annotation.OperationLog)")
     public void operationLog() {
     }
 
-    @Pointcut("@within(com.southsmart.microserver.log.annotation.OperationLog)")
+    @Pointcut("@within(com.zakl.workflow.log.annotation.OperationLog)")
     public void operationLogType() {
     }
 
