@@ -19,7 +19,7 @@ enum class WorkFlowState(val code: Int) {
     DONE(2),
     
     //未知
-    UNKNOWN(4),
+    RECALL(4),
 
     //关闭
     CLOSED(9);

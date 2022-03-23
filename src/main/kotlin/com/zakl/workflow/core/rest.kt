@@ -9,6 +9,7 @@ import com.zakl.workflow.core.service.ProcessService
 import com.zakl.workflow.core.service.dto.CompleteIdentityTaskParam
 import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.core.service.dto.StartProcessParam
+import com.zakl.workflow.log.annotation.OperationLog
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*
 @Api
 @RequestMapping("/model")
 @RestController
+@OperationLog
 class ModelController() {
     @Autowired
     lateinit var modelService: ModelService
@@ -52,6 +54,7 @@ class ModelController() {
 @Api
 @RequestMapping("/process")
 @RestController
+@OperationLog
 class ProcessController {
     @Autowired
     lateinit var processService: ProcessService
@@ -81,11 +84,17 @@ class ProcessController {
         return ResultUtil.success()
     }
 
-    @Autowired
-    lateinit var nodeTaskMapper: NodeTaskMapper
-
-    @GetMapping("/tt")
-    fun test(): Any {
-        return nodeTaskMapper.selectList(QueryWrapper());
+    @GetMapping("/closedProcessInstance/{processInstanceId}")
+    fun closedProcessInstance(@PathVariable processInstanceId: String): Result {
+        processService.closeProcessInstance(processInstanceId)
+        return ResultUtil.success()
     }
+
+    @GetMapping("/reopenProcessInstance/{processInstanceId}")
+    fun reopenProcessInstance(@PathVariable processInstanceId: String): Result {
+        processService.reOpenProcessInstance(processInstanceId)
+        return ResultUtil.success()
+    }
+
+
 }

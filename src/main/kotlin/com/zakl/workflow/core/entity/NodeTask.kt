@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import com.zakl.workflow.core.WorkFlowState
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Update
 import java.util.*
 
 @TableName(value = NodeTask.tableName)
@@ -86,5 +87,7 @@ data class NodeTask(
 
 @Mapper
 interface NodeTaskMapper : BaseMapper<NodeTask> {
+    @Update("update t_node_task set workFlowState=#{state} where processInstanceId=#{processInstanceId}")
+    fun updateState(processInstanceId: String, state: Int)
 
 }

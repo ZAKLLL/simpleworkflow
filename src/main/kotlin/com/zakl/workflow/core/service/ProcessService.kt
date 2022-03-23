@@ -44,6 +44,15 @@ interface ProcessService {
      */
     fun recallProcessInstance(processInstanceId: String)
 
+    /**
+     * 关闭流程
+     */
+    fun closeProcessInstance(processInstanceId: String)
+
+    /**
+     * 重启流程(关闭/撤回)
+     */
+    fun reOpenProcessInstance(processInstanceId: String)
 
 }
 
@@ -98,7 +107,7 @@ class ProcessServiceImpl : ProcessService {
         identityTaskId: String, variables: Map<String, *>, assignValue: String?
     ) {
         val identityTask = identityTaskMapper.selectById(identityTaskId)
-        if (identityTask.endTime!=null){
+        if (identityTask.endTime != null) {
             throw ProcessException("identityTaskId $identityTaskId 任务节点已经被执行!");
         }
         val curNode = nodeRelService.getNode(identityTask.nodeId)
@@ -139,7 +148,6 @@ class ProcessServiceImpl : ProcessService {
 
         nextNodes.any { i -> nodeRelService.checkIfHasParallel(curNode, i) }.run {
             if (this) {
-                //todo 这个功能是否应该放在 模板检测模块
                 throw CustomException.neSlf4jStyle("不可将节点提交到并行网关之前!")
             }
         }
@@ -181,7 +189,7 @@ class ProcessServiceImpl : ProcessService {
             //不存在未完成的任务节点
             if (this.isEmpty()) {
                 processInstance.endTime = Date()
-                processInstance.instanceState = WorkFlowState.DONE.code
+                processInstance.workFlowState = WorkFlowState.DONE.code
             }
         }
         processInstanceMapper.updateById(processInstance)
@@ -189,9 +197,23 @@ class ProcessServiceImpl : ProcessService {
 
 
     override fun recallProcessInstance(processInstanceId: String) {
-        TODO("Not yet implemented")
+        changeWorkFlowState(processInstanceId, WorkFlowState.RECALL)
+
     }
 
+    override fun closeProcessInstance(processInstanceId: String) {
+        changeWorkFlowState(processInstanceId, WorkFlowState.CLOSED)
+    }
+
+    private fun changeWorkFlowState(processInstanceId: String, workFlowState: WorkFlowState) {
+        processInstanceMapper.updateState(processInstanceId, workFlowState.code);
+        nodeTaskMapper.updateState(processInstanceId, workFlowState.code)
+        identityTaskMapper.updateState(processInstanceId, workFlowState.code)
+    }
+
+    override fun reOpenProcessInstance(processInstanceId: String) {
+        TODO("Not yet implemented")
+    }
 
     /**
      * 分发指定节点任务到 identity

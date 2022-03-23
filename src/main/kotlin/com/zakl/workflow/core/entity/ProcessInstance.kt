@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Update
 import java.util.*
 
 @TableName(value = ProcessInstance.tableName)
@@ -39,7 +40,7 @@ data class ProcessInstance(
     /**
      * 流程状态
      */
-    var instanceState: Int = 0
+    var workFlowState: Int = 0
 
 
     /**
@@ -65,5 +66,7 @@ data class ProcessInstance(
 
 @Mapper
 interface ProcessInstanceMapper : BaseMapper<ProcessInstance> {
+    @Update("update t_process_instance set workFlowState=#{state} where id=#{processInstanceId}")
+    fun updateState(processInstanceId: String, state: Int)
 
 }
