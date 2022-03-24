@@ -1,9 +1,7 @@
 package com.zakl.workflow.core
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.common.Result
 import com.zakl.workflow.common.ResultUtil
-import com.zakl.workflow.core.entity.NodeTaskMapper
 import com.zakl.workflow.core.service.ModelService
 import com.zakl.workflow.core.service.ProcessService
 import com.zakl.workflow.core.service.dto.CompleteIdentityTaskParam
@@ -13,6 +11,8 @@ import com.zakl.workflow.log.annotation.OperationLog
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.ModelAndView
+
 
 /**
  * @classname rest
@@ -20,6 +20,14 @@ import org.springframework.web.bind.annotation.*
  * @date 3/23/2022 11:29 AM
  * @author ZhangJiaKui
  */
+
+@RestControllerAdvice
+class MyGlobalExceptionHandler {
+    @ExceptionHandler(Exception::class)
+    fun customException(e: Exception): Result {
+        return ResultUtil.error(e.message);
+    }
+}
 
 @Api
 @RequestMapping("/model")
@@ -31,8 +39,7 @@ class ModelController() {
 
     @PostMapping("/insertOrUpdateModel")
     fun insertOrUpdateModel(@RequestBody modelInfo: ModelInfo): Result {
-        modelService.insertOrUpdateConfig(modelInfo);
-        return ResultUtil.success();
+        return ResultUtil.success(modelService.insertOrUpdateConfig(modelInfo));
     }
 
     @GetMapping("/deploy/{modelId}")

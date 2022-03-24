@@ -19,7 +19,7 @@ interface ModelService {
     /**
      * 更新model
      */
-    fun insertOrUpdateConfig(modelInfo: ModelInfo)
+    fun insertOrUpdateConfig(modelInfo: ModelInfo): ModelConfig
 
     /**
      * 部署流程
@@ -52,7 +52,7 @@ class ModelServiceImpl : ModelService {
     @Autowired
     lateinit var nodeRelService: NodeRelService
 
-    override fun insertOrUpdateConfig(modelInfo: ModelInfo) {
+    override fun insertOrUpdateConfig(modelInfo: ModelInfo): ModelConfig {
         val modelId = modelInfo.modelId
         ModelChecker.modelCheck(modelInfo)
         val model: ModelConfig
@@ -78,7 +78,7 @@ class ModelServiceImpl : ModelService {
             return@run workFlowComponents
         }.map { i -> ModelComponent(i.id, model.id!!, JSON.toJSONString(i), i.componentType) }
             .forEach(modelComponentMapper::insert)
-
+        return model
     }
 
     override fun deployModel(modelId: String) {
