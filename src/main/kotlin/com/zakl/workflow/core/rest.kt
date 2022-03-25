@@ -42,8 +42,8 @@ class ModelController() {
         return ResultUtil.success(modelService.insertOrUpdateConfig(modelInfo));
     }
 
-    @GetMapping("/deploy/{modelId}")
-    fun deploy(@PathVariable(name = "modelId") modelId: String): Result {
+    @GetMapping("/deploy")
+    fun deploy(modelId: String): Result {
         modelService.deployModel(modelId);
         return ResultUtil.success();
     }
@@ -85,20 +85,20 @@ class ProcessController {
         return ResultUtil.success()
     }
 
-    @GetMapping("/recallProcessInstance/{processInstanceId}")
-    fun recallProcessInstance(@PathVariable processInstanceId: String): Result {
+    @GetMapping("/recallProcessInstance")
+    fun recallProcessInstance(processInstanceId: String): Result {
         processService.recallProcessInstance(processInstanceId)
         return ResultUtil.success()
     }
 
-    @GetMapping("/closedProcessInstance/{processInstanceId}")
-    fun closedProcessInstance(@PathVariable processInstanceId: String): Result {
+    @GetMapping("/closedProcessInstance")
+    fun closedProcessInstance(processInstanceId: String): Result {
         processService.closeProcessInstance(processInstanceId)
         return ResultUtil.success()
     }
 
-    @GetMapping("/reopenProcessInstance/{processInstanceId}")
-    fun reopenProcessInstance(@PathVariable processInstanceId: String): Result {
+    @GetMapping("/reopenProcessInstance")
+    fun reopenProcessInstance(processInstanceId: String): Result {
         processService.reOpenProcessInstance(processInstanceId)
         return ResultUtil.success()
     }

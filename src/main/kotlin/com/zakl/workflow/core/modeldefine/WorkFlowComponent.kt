@@ -54,11 +54,15 @@ class WorkFlowGateway constructor(
     /**
      * 入路id
      */
-    var pids: Array<String>,
+    var pids: Array<String> = arrayOf(),
 
     /**
      * 出路id
      */
-    var sIds: Array<String>,
+    var sIds: Array<String> =arrayOf(),
 
-    ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)
+/**
+ * 到达人数 arrivalCnt
+ */
+var arrivalCnt: Int = 1
+) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)

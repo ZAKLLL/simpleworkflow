@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.modeldefine.ModelChecker
 import com.zakl.workflow.core.modeldefine.WorkFlowComponentBase
 import com.zakl.workflow.core.service.dto.ModelInfo
@@ -52,6 +53,10 @@ class ModelServiceImpl : ModelService {
     @Autowired
     lateinit var nodeRelService: NodeRelService
 
+    @Autowired
+    lateinit var processInstanceMapper: ProcessInstanceMapper
+
+
     override fun insertOrUpdateConfig(modelInfo: ModelInfo): ModelConfig {
         val modelId = modelInfo.modelId
         ModelChecker.modelCheck(modelInfo)
@@ -82,6 +87,15 @@ class ModelServiceImpl : ModelService {
     }
 
     override fun deployModel(modelId: String) {
+        //如果现有流程尚未执行完毕,则不允许进行变更
+        processInstanceMapper.selectList(
+            QueryWrapper<ProcessInstance?>().eq("modelId", modelId).ne("workFlowState", WorkFlowState.DONE.code)
+        ).run {
+            if (this.isNotEmpty()) {
+                throw CustomException.neSlf4jStyle("当前model: {} ,存在尚未完成的流程! 不可进行更新部署", modelId)
+            }
+        }
+
         modelConfigMapper.deployModel(modelId)
         nodeRelService.initModelComponents(
             modelId,
@@ -98,6 +112,6 @@ class ModelServiceImpl : ModelService {
         if (deployStatus != -1) {
             queryWrapper = queryWrapper.eq("idDeploy", deployStatus == 1)
         }
-        return modelConfigMapper.selectPage(Page(page.toLong(), size.toLong()),queryWrapper)
+        return modelConfigMapper.selectPage(Page(page.toLong(), size.toLong()), queryWrapper)
     }
 }
