@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="11e7fb8b-1b26-4aed-84c9-0c50047f120b" name="Changes" comment="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/WorkFlowApplication.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/BasePersistentObject.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/Constant.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/Result.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/ResultUtil.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/util.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/BasePersistentMetaHandler.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/CorsConfig.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/SwaggerConfig.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/WorkFlowState.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/IdentityTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ModelComponent.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ModelConfig.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/NodeTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ProcessInstance.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/Eval.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/GatewayType.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/ModelChecker.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/NodeType.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/WorkFlowComponent.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/rest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/ModelService.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/NodeRelService.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/ProcessService.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/dto/param.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/exception/CustomException.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/exception/WorkFlowException.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/annotation/OperationLog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/aspect/LogAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/constant/LogItemNames.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/enums/OperationType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/utils/LogUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/utils/OutputLogParameter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/encache.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/MyTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/T.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/ZaklWorkFlowApplicationTests.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow.sql" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Object" />
+        <option value="Kotlin Data Class" />
+        <option value="Kotlin Enum" />
+        <option value="Class" />
+        <option value="Kotlin Class" />
+        <option value="Kotlin Interface" />
+        <option value="Kotlin File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="C:\Program Files\JetBrains\IntelliJ IDEA 2020.2.3\plugins\maven\lib\maven3" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectId" id="26XV25CME46HDterbS1s6R4tqfV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/simpleWorkFlow_frontend" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.08053166" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+  </component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\studyProjects\simpleWorkFlow\src\main\kotlin\com\zakl\workflow" />
+      <recent name="D:\studyProjects\simpleWorkFlow\src\main\kotlin\com\zakl\workflow\common" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\studyProjects\simpleWorkFlow\src\main\kotlin\com\zakl\workflow\core\modeldefine" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.zakl.workflow.common" />
+      <recent name="com.zakl.workflow.rest" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.zakl.workflow.common" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.WorkFlowApplication">
+    <configuration name="MyTest.t1" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="zaklWorkFlow" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zakl.workflow.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.zakl.workflow" />
+      <option name="MAIN_CLASS_NAME" value="com.zakl.workflow.MyTest" />
+      <option name="METHOD_NAME" value="t1" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EvalKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zakl.workflow.core.EvalKt" />
+      <module name="zaklWorkFlow" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ParamKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zakl.workflow.core.service.dto.ParamKt" />
+      <module name="zaklWorkFlow" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WorkFlowNodeKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.zakl.workflow.core.WorkFlowNodeKt" />
+      <module name="zaklWorkFlow" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WorkFlowApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="zaklWorkFlow" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.zakl.workflow.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.zakl.workflow.WorkFlowApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.WorkFlowApplication" />
+        <item itemvalue="Kotlin.ParamKt" />
+        <item itemvalue="Kotlin.EvalKt" />
+        <item itemvalue="JUnit.MyTest.t1" />
+        <item itemvalue="Kotlin.WorkFlowNodeKt" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="11e7fb8b-1b26-4aed-84c9-0c50047f120b" name="Changes" comment="" />
+      <created>1647569709887</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1647569709887</updated>
+      <workItem from="1647569712456" duration="468000" />
+      <workItem from="1647570209720" duration="425000" />
+      <workItem from="1647570741726" duration="3377000" />
+      <workItem from="1647582299206" duration="14968000" />
+      <workItem from="1647823711093" duration="28326000" />
+      <workItem from="1647928850784" duration="691000" />
+      <workItem from="1647997680378" duration="18860000" />
+      <workItem from="1648089456593" duration="11143000" />
+      <workItem from="1648192098138" duration="188000" />
+    </task>
+    <task id="LOCAL-00001" summary="feat:创建项目">
+      <created>1647591143567</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1647591143568</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat:添加部分校验逻辑">
+      <created>1647596939815</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1647596939815</updated>
+    </task>
+    <task id="LOCAL-00003" summary="feat:从node中抽取网关">
+      <created>1647598599659</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1647598599659</updated>
+    </task>
+    <task id="LOCAL-00004" summary="feat:  实现insertOrUpdateConfig 函数">
+      <created>1647829500159</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1647829500159</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat:&#10;新增NodeRelService.kt 模块用作处理模型节点的关联关系">
+      <created>1647848806137</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1647848806137</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: 实现后端审批整体框架">
+      <created>1647927507733</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1647927507733</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: 修复启动问题">
+      <created>1647927831014</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1647927831014</updated>
+    </task>
+    <task id="LOCAL-00008" summary="feat:&#10;新增sql,完善流程配置，完善部分数据模型">
+      <created>1648015946974</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1648015946974</updated>
+    </task>
+    <task id="LOCAL-00009" summary="feat:&#10;1. 新增log 模块，用作web调用记录&#10;2. 新增部分流程部署/启动接口">
+      <created>1648028414884</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1648028414884</updated>
+    </task>
+    <task id="LOCAL-00010" summary="mo">
+      <created>1648029988473</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1648029988473</updated>
+    </task>
+    <task id="LOCAL-00011" summary="mo">
+      <created>1648030056599</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1648030056599</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制">
+      <created>1648191876773</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1648191876773</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <MESSAGE value="feat:创建项目" />
+    <MESSAGE value="feat:添加部分校验逻辑" />
+    <MESSAGE value="feat:从node中抽取网关" />
+    <MESSAGE value="feat:  实现insertOrUpdateConfig 函数" />
+    <MESSAGE value="feat:&#10;新增NodeRelService.kt 模块用作处理模型节点的关联关系" />
+    <MESSAGE value="feat: 实现后端审批整体框架" />
+    <MESSAGE value="feat: 修复启动问题" />
+    <MESSAGE value="feat:&#10;新增sql,完善流程配置，完善部分数据模型" />
+    <MESSAGE value="feat:&#10;1. 新增log 模块，用作web调用记录&#10;2. 新增部分流程部署/启动接口" />
+    <MESSAGE value="mo" />
+    <MESSAGE value="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制" />
+  </component>
+</project>

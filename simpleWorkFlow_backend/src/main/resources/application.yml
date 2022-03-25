@@ -1,0 +1,33 @@
+server:
+  port: 8092
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/zaklworkflow?serverTimezone=UTC&characterEncoding=utf-8
+    username: root
+    password: ZJK15626933724
+#    password: 123456
+
+  redis:
+    host: 127.0.0.1
+    database: 0
+
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:encache.xml
+
+
+
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: false
+  global-config:
+    db-config:
+      update-strategy: ignored
+
+
