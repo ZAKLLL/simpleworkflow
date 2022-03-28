@@ -6,12 +6,12 @@ import com.zakl.workflow.core.service.ModelService
 import com.zakl.workflow.core.service.ProcessService
 import com.zakl.workflow.core.service.dto.CompleteIdentityTaskParam
 import com.zakl.workflow.core.service.dto.ModelInfo
+import com.zakl.workflow.core.service.dto.ReOpenProcessParam
 import com.zakl.workflow.core.service.dto.StartProcessParam
 import com.zakl.workflow.log.annotation.OperationLog
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.ModelAndView
 
 
 /**
@@ -73,9 +73,9 @@ class ProcessController {
         return ResultUtil.success()
     }
 
-    @GetMapping("/identityTasks/{identityId}")
-    fun getIdentityTasks(identityId: String): Result {
-        return ResultUtil.success(processService.getIdentityTasks(identityId))
+    @GetMapping("/identityTasks")
+    fun getIdentityTasks(identityId: String, workFlowState: WorkFlowState?): Result {
+        return ResultUtil.success(processService.getIdentityTasks(identityId, workFlowState))
     }
 
     @PostMapping("/completeIdentityTask")
@@ -98,8 +98,8 @@ class ProcessController {
     }
 
     @GetMapping("/reopenProcessInstance")
-    fun reopenProcessInstance(processInstanceId: String): Result {
-        processService.reOpenProcessInstance(processInstanceId)
+    fun reopenProcessInstance(@RequestBody reOpenProcessParam: ReOpenProcessParam): Result {
+        processService.reOpenProcessInstance(reOpenProcessParam)
         return ResultUtil.success()
     }
 

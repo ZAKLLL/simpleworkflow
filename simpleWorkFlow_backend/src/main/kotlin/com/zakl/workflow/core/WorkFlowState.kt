@@ -18,7 +18,7 @@ enum class WorkFlowState(val code: Int) {
     //通过
     DONE(2),
     
-    //未知
+    //撤回
     RECALL(4),
 
     //关闭

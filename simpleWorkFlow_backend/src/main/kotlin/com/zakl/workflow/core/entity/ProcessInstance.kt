@@ -40,7 +40,7 @@ data class ProcessInstance(
     /**
      * 流程状态
      */
-    var workFlowState: Int = 0
+    var workFlowState: Int = 1
 
 
     /**

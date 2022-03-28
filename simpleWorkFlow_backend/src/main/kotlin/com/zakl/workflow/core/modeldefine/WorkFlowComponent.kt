@@ -61,8 +61,4 @@ class WorkFlowGateway constructor(
      */
     var sIds: Array<String> =arrayOf(),
 
-/**
- * 到达人数 arrivalCnt
- */
-var arrivalCnt: Int = 1
 ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)

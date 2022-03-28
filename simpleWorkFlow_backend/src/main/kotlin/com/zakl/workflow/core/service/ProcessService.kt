@@ -10,6 +10,7 @@ import com.zakl.workflow.core.modeldefine.NodeType
 import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.core.entity.*
+import com.zakl.workflow.core.service.dto.ReOpenProcessParam
 import com.zakl.workflow.exception.CustomException
 import com.zakl.workflow.exception.NodeIdentityAssignException
 import com.zakl.workflow.exception.ProcessException
@@ -32,7 +33,7 @@ interface ProcessService {
     /**
      * 查询所分配的任务
      */
-    fun getIdentityTasks(identityId: String): List<IdentityTask>
+    fun getIdentityTasks(identityId: String, workFlowState: WorkFlowState?): List<IdentityTask>
 
     /**
      * 执行任务
@@ -52,7 +53,7 @@ interface ProcessService {
     /**
      * 重启流程(关闭/撤回)
      */
-    fun reOpenProcessInstance(processInstanceId: String)
+    fun reOpenProcessInstance(processInstanceId: ReOpenProcessParam)
 
 }
 
@@ -99,8 +100,14 @@ class ProcessServiceImpl : ProcessService {
     /**
      * 查询identity 对应的任务
      */
-    override fun getIdentityTasks(identityId: String): List<IdentityTask> {
-        return identityTaskMapper.selectList(QueryWrapper<IdentityTask>().eq("identityId", identityId))
+    override fun getIdentityTasks(identityId: String, workFlowState: WorkFlowState?): List<IdentityTask> {
+        return identityTaskMapper.selectList(
+            QueryWrapper<IdentityTask>().eq("identityId", identityId).also {
+                if (workFlowState != null) {
+                    it.eq("workflowState", workFlowState.code)
+                }
+            }
+        )
     }
 
     override fun completeIdentityTask(
@@ -211,8 +218,24 @@ class ProcessServiceImpl : ProcessService {
         identityTaskMapper.updateState(processInstanceId, workFlowState.code)
     }
 
-    override fun reOpenProcessInstance(processInstanceId: String) {
-        TODO("Not yet implemented")
+    override fun reOpenProcessInstance(reOpenProcessParam: ReOpenProcessParam) {
+
+        val processInstance = processInstanceMapper.selectById(reOpenProcessParam.processInstanceId).also {
+            it.workFlowState = WorkFlowState.HANDLING.code;
+            processInstanceMapper.updateById(it)
+        }
+
+        //生成startNode 的任务
+        val startNode = nodeRelService.getStartNode(processInstance.modelId)
+
+        //将开始节点作为任务分发给申请人
+        val curIdentityTask = distributeIdentityTask(
+            reOpenProcessParam.processInstanceId,
+            startNode,
+            listOf(processInstance.identityId)
+        )[0]
+
+        completeIdentityTask(curIdentityTask.id!!, reOpenProcessParam.variables, reOpenProcessParam.assignValue)
     }
 
     /**
