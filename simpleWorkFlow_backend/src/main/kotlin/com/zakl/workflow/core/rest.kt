@@ -4,10 +4,10 @@ import com.zakl.workflow.common.Result
 import com.zakl.workflow.common.ResultUtil
 import com.zakl.workflow.core.service.ModelService
 import com.zakl.workflow.core.service.ProcessService
-import com.zakl.workflow.core.service.dto.CompleteIdentityTaskParam
-import com.zakl.workflow.core.service.dto.ModelInfo
-import com.zakl.workflow.core.service.dto.ReOpenProcessParam
-import com.zakl.workflow.core.service.dto.StartProcessParam
+import com.zakl.workflow.core.service.CompleteIdentityTaskParam
+import com.zakl.workflow.core.service.ModelInfo
+import com.zakl.workflow.core.service.ReOpenProcessParam
+import com.zakl.workflow.core.service.StartProcessParam
 import com.zakl.workflow.log.annotation.OperationLog
 import io.swagger.annotations.Api
 import org.springframework.beans.factory.annotation.Autowired

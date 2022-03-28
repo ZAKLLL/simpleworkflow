@@ -3,14 +3,16 @@ package com.zakl.workflow.core.service
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
+import com.zakl.workflow.common.Constant.Companion.EVENT_NODE_IDENTITYID
 import com.zakl.workflow.common.combineVariablesToStr
 import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
-import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
-import com.zakl.workflow.core.modeldefine.NodeType
 import com.zakl.workflow.core.WorkFlowState
-import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.core.entity.*
-import com.zakl.workflow.core.service.dto.ReOpenProcessParam
+import com.zakl.workflow.core.eventTask.EventTaskExecute
+import com.zakl.workflow.core.eventTask.EventTaskThreadPool
+import com.zakl.workflow.core.modeldefine.NodeType
+import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.exception.CustomException
 import com.zakl.workflow.exception.NodeIdentityAssignException
 import com.zakl.workflow.exception.ProcessException
@@ -18,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import kotlin.collections.ArrayList
 
 private const val SERVICE_BEAN_NAME: String = "processService";
 
@@ -75,6 +76,10 @@ class ProcessServiceImpl : ProcessService {
 
     @Autowired
     lateinit var nodeRelService: NodeRelService
+
+    //todo check 是否出现循环依赖
+    @Autowired
+    lateinit var eventTaskThreadPool: EventTaskThreadPool
 
     /**
      * 开启新流程
@@ -162,10 +167,19 @@ class ProcessServiceImpl : ProcessService {
         for (nextNode in nextNodes) {
             val nextNodeIdentityIds =
                 getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.id)
-            if (nextNodeIdentityIds.isEmpty()) {
-                throw NodeIdentityAssignException("nextNodeIdentityIds.isEmpty ! ,nextNode:$nextNode")
+            if (nextNode.type == NodeType.EVENT_TASK_NODE) {
+                if (nextNodeIdentityIds.isNotEmpty()) {
+                    throw NodeIdentityAssignException("nextNode: $nextNode is Event_node_task,nextNodeIdentityIds shall be empty!")
+                } else {
+                    //EVENT_TASK_NODE 的identityId为固定的
+                    distributeIdentityTask(nodeTask.processInstanceId, nextNode, listOf(EVENT_NODE_IDENTITYID))
+                }
+            } else {
+                if (nextNodeIdentityIds.isEmpty()) {
+                    throw NodeIdentityAssignException("nextNode IdentityIds.isEmpty ! ,nextNode:$nextNode")
+                }
+                distributeIdentityTask(nodeTask.processInstanceId, nextNode, nextNodeIdentityIds)
             }
-            distributeIdentityTask(processInstanceId = nodeTask.processInstanceId, nextNode, nextNodeIdentityIds)
         }
 
     }
@@ -265,6 +279,30 @@ class ProcessServiceImpl : ProcessService {
             identityTasks.add(identityTask)
         }
 
+        if (node.type == NodeType.EVENT_TASK_NODE) {
+            doEventNodeTaskSubmit(node, identityTasks);
+        }
+
         return identityTasks;
+    }
+
+
+    /**
+     * 提交eventNode 到threapool
+     */
+    fun doEventNodeTaskSubmit(eventTaskNode: WorkFlowNode, identityTasks: ArrayList<IdentityTask>) {
+        if (identityTasks.size != 1) {
+            throw CustomException.neSlf4jStyle("EVENT_TASK_NODE should only has one identityTask!");
+        }
+        val identityTask = identityTasks[0]
+        val nodeTask = nodeTaskMapper.selectById(identityTask.nodeTaskId)
+        if (eventTaskNode.EVENT_TASK_EXECUTOR == null) {
+            throw CustomException.neSlf4jStyle("EVENT_TASK_NODE shoud has an EVENT_TASK_EXECUTOR");
+        }
+
+        val eventTaskExecute = Class.forName(eventTaskNode.EVENT_TASK_EXECUTOR).newInstance() as EventTaskExecute
+        eventTaskThreadPool.submit {
+            eventTaskExecute.execute(identityTask.id!!, nodeTask.getVariablesMap())
+        }
     }
 }

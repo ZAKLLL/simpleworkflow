@@ -1,4 +1,4 @@
-package com.zakl.workflow.core.service.dto
+package com.zakl.workflow.core.service
 
 import com.zakl.workflow.core.modeldefine.WorkFlowGateway
 import com.zakl.workflow.core.modeldefine.WorkFlowLine

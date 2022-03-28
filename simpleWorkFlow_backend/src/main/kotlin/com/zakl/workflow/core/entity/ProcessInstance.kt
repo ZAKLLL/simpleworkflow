@@ -54,8 +54,8 @@ data class ProcessInstance(
     var endTime: Date? = null
 
 
-    fun getVariablesMap(): Map<*, *> {
-        return JSONObject.parseObject(variables, Map::class.java)
+    fun getVariablesMap(): Map<String, *> {
+        return JSONObject.parseObject(variables, Map::class.java) as Map<String, *>
     }
 
     constructor() : this("", "", "") {

@@ -27,7 +27,12 @@ class WorkFlowNode constructor(
     /**
      * 多人会签通过比例(默认为1)
      */
-    var mutliCompleteRatio: Double? = 1.0
+    var mutliCompleteRatio: Double? = 1.0,
+
+    /**
+     * 事件任务触发器
+     */
+    var EVENT_TASK_EXECUTOR: String? = null
 ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_NODE)
 
 /**
@@ -59,6 +64,6 @@ class WorkFlowGateway constructor(
     /**
      * 出路id
      */
-    var sIds: Array<String> =arrayOf(),
+    var sIds: Array<String> = arrayOf(),
 
-) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)
+    ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_GATEWAY)

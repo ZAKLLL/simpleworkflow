@@ -2,7 +2,7 @@ package com.zakl.workflow.core.modeldefine
 
 import cn.hutool.core.util.StrUtil
 import com.zakl.workflow.core.checkConditionExpressionFormat
-import com.zakl.workflow.core.service.dto.ModelInfo
+import com.zakl.workflow.core.service.ModelInfo
 import com.zakl.workflow.exception.ModelDefineException
 import java.util.stream.Collectors
 

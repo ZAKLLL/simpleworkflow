@@ -4,53 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="11e7fb8b-1b26-4aed-84c9-0c50047f120b" name="Changes" comment="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/WorkFlowApplication.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/BasePersistentObject.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/Constant.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/Result.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/ResultUtil.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/common/util.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/BasePersistentMetaHandler.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/CorsConfig.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/config/SwaggerConfig.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/WorkFlowState.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/IdentityTask.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ModelComponent.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ModelConfig.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/NodeTask.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/entity/ProcessInstance.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/Eval.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/GatewayType.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/ModelChecker.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/NodeType.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/modeldefine/WorkFlowComponent.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/rest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/ModelService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/NodeRelService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/ProcessService.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/core/service/dto/param.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/exception/CustomException.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/exception/WorkFlowException.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/annotation/OperationLog.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/aspect/LogAspect.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/constant/LogItemNames.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/enums/OperationType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/utils/LogUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/com/zakl/workflow/log/utils/OutputLogParameter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/encache.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/MyTest.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/T.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/com/zakl/workflow/ZaklWorkFlowApplicationTests.kt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow.sql" beforeDir="false" />
-    </list>
+    <list default="true" id="11e7fb8b-1b26-4aed-84c9-0c50047f120b" name="Changes" comment="fix: WorkFlowGateway 为pids sids 添加默认值, 解决jackJson 接收@requestBody 参数 不能正常反序列化bug&#10;feat:完善部署限制" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,7 +61,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/simpleWorkFlow_frontend" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/simpleWorkFlow_backend" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -222,6 +176,7 @@
       <workItem from="1647997680378" duration="18860000" />
       <workItem from="1648089456593" duration="11143000" />
       <workItem from="1648192098138" duration="188000" />
+      <workItem from="1648472828561" duration="14000" />
     </task>
     <task id="LOCAL-00001" summary="feat:创建项目">
       <created>1647591143567</created>
@@ -335,7 +290,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />

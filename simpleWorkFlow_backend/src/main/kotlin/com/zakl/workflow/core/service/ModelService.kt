@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.modeldefine.ModelChecker
 import com.zakl.workflow.core.modeldefine.WorkFlowComponentBase
-import com.zakl.workflow.core.service.dto.ModelInfo
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired

@@ -78,8 +78,8 @@ data class NodeTask(
 
     }
 
-    fun getVariablesMap(): Map<*, *> {
-        return JSONObject.parseObject(variables, Map::class.java)
+    fun getVariablesMap(): Map<String, *> {
+        return JSONObject.parseObject(variables, Map::class.java) as Map<String, *>
     }
 
 

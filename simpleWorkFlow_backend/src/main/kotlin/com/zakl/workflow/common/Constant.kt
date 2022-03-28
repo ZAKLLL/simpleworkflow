@@ -36,6 +36,10 @@ class Constant {
          */
         const val COMPONENT_TYPE_LINE = "line"
 
+        /**
+         * 事件类型任务自动审批identityID
+         */
+        const val EVENT_NODE_IDENTITYID = "EVENT_NODE_IDENTITYID"
 
         /**
          * 审批评论

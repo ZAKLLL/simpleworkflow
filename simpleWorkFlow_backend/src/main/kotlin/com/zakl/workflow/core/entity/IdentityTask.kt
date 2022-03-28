@@ -65,12 +65,13 @@ class IdentityTask(
     var workFlowState: Int = WorkFlowState.HANDLING.code
 
     /**
-     * identity 变量
+     *
      */
     var variables: String? = "{}"
 
     /**
      * 指定identity Id
+     * nodeId1:identityId1;nodeId2:identityId2;
      */
     var nextAssignValue: String? = null;
 
