@@ -25,12 +25,6 @@
             <el-input v-model="node.ico"></el-input>
           </el-form-item>
 
-          <el-form-item label="网关到达" v-show="node.gateway">
-            <el-input
-              onkeyup="value=value.replace(/[^\d]/g,'')"
-              v-model="node.arrivalCnt"
-            ></el-input>
-          </el-form-item>
 
           <el-form-item label="状态">
             <el-select v-model="node.state" placeholder="请选择">
@@ -159,7 +153,6 @@ export default {
           node.top = this.node.top;
           node.ico = this.node.ico;
           node.state = this.node.state;
-          node.arrivalCnt = this.node.arrivalCnt;
           this.$emit("repaintEverything");
         }
       });

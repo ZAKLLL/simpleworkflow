@@ -102,7 +102,7 @@ class ModelChecker private constructor(
 
         for (gateway in gatewayMap.values) {
             if (gateway.pids.isEmpty() || gateway.sIds.isEmpty()) {
-                throw ModelDefineException("line 需要拥有入路及出路!")
+                throw ModelDefineException("gateway 需要拥有入路及出路!")
             }
         }
         return startNode
