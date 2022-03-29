@@ -2,6 +2,7 @@ package com.zakl.workflow.core.eventTask;
 
 import com.zakl.workflow.common.SpringContextBeanUtils;
 import com.zakl.workflow.core.service.ProcessService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -20,7 +21,9 @@ import static com.zakl.workflow.core.eventTask.EventTaskThreadPool.COMPONENT_BEA
  **/
 @Component(value = COMPONENT_BEAN_NAME)
 @DependsOn(value = "processService")
+@Slf4j
 public class EventTaskThreadPool {
+
     public final static String COMPONENT_BEAN_NAME = "EventTaskThreadPool";
 
     @Value("${event-task-thread-pool.size:10}")
@@ -44,15 +47,16 @@ public class EventTaskThreadPool {
     @PostConstruct()
     public void beanInit() {
         processService = SpringContextBeanUtils.getBean(ProcessService.class);
-    }
-
-
-    private EventTaskThreadPool() {
         threadPoolInit();
     }
 
 
+    private EventTaskThreadPool() {
+    }
+
+
     public void submit(Callable<EventTaskExecuteResult> callable) {
+        log.info("接收到EventTaskThread :{}",callable.toString());
         synchronized (TASK_QUEUE) {
             TASK_QUEUE.addLast(callable);
             TASK_QUEUE.notifyAll();
@@ -106,6 +110,7 @@ public class EventTaskThreadPool {
                     taskState = TaskState.RUNNING;
                     try {
                         EventTaskExecuteResult res = callable.call();
+                        log.info("EventTask:{} 任务处理完毕,即将执行自动审批动作",res.getIdentityTaskId());
                         //自动审批任务进行完毕后执行自动审批动作
                         processService.completeIdentityTask(res.getIdentityTaskId(), res.getVariables(), res.getAssignValue());
                     } catch (Exception e) {

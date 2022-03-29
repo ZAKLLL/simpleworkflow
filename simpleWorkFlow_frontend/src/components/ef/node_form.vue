@@ -16,11 +16,23 @@
             <el-input v-model="node.name"></el-input>
           </el-form-item>
 
-          <el-form-item label="任务执行器"  v-show="node.type === 'EVENT_TASK_NODE'">
-            <el-input
-             
-              v-model="node.eventTaskExecutor"
-            ></el-input>
+          <el-form-item
+            label="多人会签比例"
+            v-show="node.type === 'MULTI_USER_TASK_NODE'"
+          >
+            <el-input-number
+              :min="0"
+              :controls="false"
+              :precision="2"
+              v-model="node.mutliCompleteRatio"
+            ></el-input-number>
+          </el-form-item>
+
+          <el-form-item
+            label="任务执行器"
+            v-show="node.type === 'EVENT_TASK_NODE'"
+          >
+            <el-input v-model="node.eventTaskExecutor"></el-input>
           </el-form-item>
 
           <el-form-item label="left坐标">
@@ -56,20 +68,18 @@
           :model="line"
           ref="dataForm"
           label-width="80px"
-          v-show="type === 'line'"
+          v-show="showLineForm"
         >
           <el-form-item label="条件">
             <el-input v-model="line.label"></el-input>
           </el-form-item>
           <el-form-item label="优先级">
-            <el-input
-              type="text"
-              onkeyup="value=value.replace(/[^\d]/g,'')"
-              size="small"
-              width="50"
+            <el-input-number
+              :min="0"
+              :controls="false"
+              :precision="0"
               v-model="line.exclusiveOrder"
-              placeholder="请输入数字"
-            ></el-input>
+            ></el-input-number>
           </el-form-item>
 
           <el-form-item>
@@ -95,6 +105,7 @@ export default {
       node: {},
       line: {},
       data: {},
+      showLineForm:false,
       stateList: [
         {
           state: "success",
@@ -139,7 +150,7 @@ export default {
           this.line["exclusiveOrder"] = i["exclusiveOrder"];
         }
       });
-      console.log("line", line);
+      this.showLineForm=this.ifShowLineForm()
     },
     // 修改连线
     saveLine() {
@@ -150,7 +161,6 @@ export default {
         this.line.label,
         this.line.exclusiveOrder
       );
-      //   this.$emit("$message.succss","保存成功")
     },
     save() {
       this.data.nodeList.filter((node) => {
@@ -160,7 +170,8 @@ export default {
           node.top = this.node.top;
           node.ico = this.node.ico;
           node.state = this.node.state;
-          node.eventTaskExecutor=this.node.eventTaskExecutor
+          node.eventTaskExecutor = this.node.eventTaskExecutor;
+          node.mutliCompleteRatio = this.node.mutliCompleteRatio;
           this.$emit("repaintEverything");
         }
       });
@@ -181,6 +192,18 @@ export default {
         }
       });
       //   this.$message.succss("重置成功")
+    },
+    ifShowLineForm() {
+      if (this.type != "line") {
+        return false;
+      }
+      //line 的 from节点必须是 EXCLUSIVE_GATEWAY
+      for (var node of this.data.nodeList) {
+        if (this.line.from == node.id) {
+          return node.type == "EXCLUSIVE_GATEWAY";
+        }
+      }
+      return false
     },
   },
 };
