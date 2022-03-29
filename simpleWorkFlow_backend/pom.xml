@@ -15,7 +15,7 @@
     <description>simpleWorkFlow_backend</description>
     <properties>
         <java.version>8</java.version>
-        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.version>1.6.20-RC2</kotlin.version>
         <swagger.version>2.9.2</swagger.version>
         <swagger.model.version>1.5.22</swagger.model.version>
         <swagger-ui.version>2.9.2</swagger-ui.version>
@@ -141,6 +141,11 @@
             <artifactId>swagger-bootstrap-ui</artifactId>
             <version>1.9.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
 
 
     </dependencies>
@@ -197,6 +202,26 @@
                         <version>${kotlin.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
