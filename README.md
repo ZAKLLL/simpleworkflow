@@ -102,7 +102,8 @@ simpleWorkflow为一个由kotlin+SpringBoot+mybatis-Plus 编写的轻量级工�
         + 结束节点: 买个流程都应该具有结束节点,此节点在流程中可以为多个,但是每个除结束节点之外的节点均具有到达结束节点的通路.
         + 单人审批节点: 每个节点只会产生一个identitytask分配给一个identity,进行审批。
         + 多人会签节点: 每个节点只会产生多个identitytask分配给多个identity,进行审批。
-        + 任务节点: 无需审批，该节点自行触发审批功能，完成后自动流转到下个阶段(开发中...)
+        + 任务节点: 无需审批，该节点自行触发审批功能，完成后自动流转到下个阶段
+          + 详情见**example/event_node_task.md**
       + line:
         + 节点出发: 无任何条件，节点完成后自动通过次line流转到下个元素
         + 排他网关出发: 需要指定flowConditionExpression(条件表达式) 及 exclusiveOrder(排他顺序),优先按照排他顺序，选择指定line,校验 flowConditionExpression 是否满足，如匹配成功，通过当前line 进入下个审批元素
@@ -110,9 +111,9 @@ simpleWorkflow为一个由kotlin+SpringBoot+mybatis-Plus 编写的轻量级工�
       + 网关:
         + 排他网关:  经过此网关的 流程只会产生一个实际通路
         + 并行网关:  经过此网关的 流程只会产生多条实际通路,通路数等于网关出度
-
+  
   + 系统启动:
-
+  
     + git clone git@github.com:ZAKLLL/simpleworkflow.git
     + cd simpleWorkflow_backend
     + mvn clean install
@@ -123,15 +124,15 @@ simpleWorkflow为一个由kotlin+SpringBoot+mybatis-Plus 编写的轻量级工�
       + t_process_instance: 流程实例表
       + t_node_task:节点任务表
       + t_identity_task: identity任务表
-
+  
   + 系统核心api:
-
+  
     + model-controller(流程模型配置相关，包括新增，更新，部署，模型检测等)
-
+  
       ![image-20220328135825462](image-20220328135825462.png)
-
+  
     + process-controller(流程审批相关，包括启动,关闭,撤回,审批,查询identity相关任务等)
-
+  
       ![image-20220328135934513](image-20220328135934513.png)
 
 

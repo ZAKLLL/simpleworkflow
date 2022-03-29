@@ -38,7 +38,7 @@ public class EventTaskThreadPool {
 
     private final static ThreadGroup group = new ThreadGroup("Pool_Group");
 
-    private final static LinkedList<WorkerTask> Thread_Queue = new LinkedList<>();
+    private final static LinkedList<WorkerTask> THREAD_QUEUE = new LinkedList<>();
 
 
     private static ProcessService processService;
@@ -72,7 +72,7 @@ public class EventTaskThreadPool {
     private void createworktask() {
         WorkerTask workerTask = new WorkerTask(group, THREAD_PREFIX + (seq++));
         workerTask.start();
-        Thread_Queue.add(workerTask);
+        THREAD_QUEUE.add(workerTask);
     }
 
     private enum TaskState {

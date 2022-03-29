@@ -6,16 +6,21 @@ import java.io.File
 import java.io.FileWriter
 import java.util.*
 
-@FunctionalInterface
-interface EventTaskExecute {
-    fun execute(identityTaskId: String, variables: Map<String, *>): EventTaskExecuteResult
-}
-
 class EventTaskExecuteResult(
     var identityTaskId: String,
     var variables: Map<String, *>,
     var assignValue: String?
 )
+
+
+@FunctionalInterface
+interface EventTaskExecute {
+    /**
+     * 任务节点执行器需要实现的函数,此函数为具体任务节点的业务逻辑实现
+     */
+    fun execute(identityTaskId: String, variables: Map<String, *>): EventTaskExecuteResult
+}
+
 
 class CREATE_FILE_IN_DESKTOP : EventTaskExecute {
     override fun execute(identityTaskId: String, variables: Map<String, *>): EventTaskExecuteResult {
