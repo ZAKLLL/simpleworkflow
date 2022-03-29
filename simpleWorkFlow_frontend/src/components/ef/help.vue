@@ -30,10 +30,6 @@
                 <el-divider content-position="left">如何添加条件</el-divider>
                 <div>点击画布中的连线，在页面右侧会出现一个表单，输入新的条件，点击【保存】</div>
             </el-tab-pane>
-            <el-tab-pane label="如何进行后端交互存储">
-                <el-divider content-position="left">如何进行后端交互存储</el-divider>
-                <div>参考: https://gitee.com/xiaoka2017/easy-flow-sdk</div>
-            </el-tab-pane>
         </el-tabs>
     </el-dialog>
 </template>
