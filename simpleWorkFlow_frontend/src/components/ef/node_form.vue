@@ -15,6 +15,14 @@
           <el-form-item label="名称">
             <el-input v-model="node.name"></el-input>
           </el-form-item>
+
+          <el-form-item label="任务执行器"  v-show="node.type === 'EVENT_TASK_NODE'">
+            <el-input
+             
+              v-model="node.eventTaskExecutor"
+            ></el-input>
+          </el-form-item>
+
           <el-form-item label="left坐标">
             <el-input v-model="node.left" :disabled="true"></el-input>
           </el-form-item>
@@ -24,7 +32,6 @@
           <el-form-item label="ico图标">
             <el-input v-model="node.ico"></el-input>
           </el-form-item>
-
 
           <el-form-item label="状态">
             <el-select v-model="node.state" placeholder="请选择">
@@ -153,6 +160,7 @@ export default {
           node.top = this.node.top;
           node.ico = this.node.ico;
           node.state = this.node.state;
+          node.eventTaskExecutor=this.node.eventTaskExecutor
           this.$emit("repaintEverything");
         }
       });

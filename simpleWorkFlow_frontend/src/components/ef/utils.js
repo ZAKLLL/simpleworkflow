@@ -86,6 +86,7 @@ export function genBackEndData(data) {
           top: i.top,
           left: i.left,
           ico: i.ico,
+          eventTaskExecutor:i.eventTaskExecutor,
           pid:
             i.id in nodeInLineDict
               ? nodeInLineDict[i.id].length > 0

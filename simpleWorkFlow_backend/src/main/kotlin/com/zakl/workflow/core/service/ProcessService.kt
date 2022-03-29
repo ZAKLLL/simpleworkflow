@@ -296,11 +296,11 @@ class ProcessServiceImpl : ProcessService {
         }
         val identityTask = identityTasks[0]
         val nodeTask = nodeTaskMapper.selectById(identityTask.nodeTaskId)
-        if (eventTaskNode.EVENT_TASK_EXECUTOR == null) {
+        if (eventTaskNode.eventTaskExecutor == null) {
             throw CustomException.neSlf4jStyle("EVENT_TASK_NODE shoud has an EVENT_TASK_EXECUTOR");
         }
 
-        val eventTaskExecute = Class.forName(eventTaskNode.EVENT_TASK_EXECUTOR).newInstance() as EventTaskExecute
+        val eventTaskExecute = Class.forName(eventTaskNode.eventTaskExecutor).newInstance() as EventTaskExecute
         eventTaskThreadPool.submit {
             eventTaskExecute.execute(identityTask.id!!, nodeTask.getVariablesMap())
         }

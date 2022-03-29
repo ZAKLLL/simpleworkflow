@@ -32,7 +32,7 @@ class WorkFlowNode constructor(
     /**
      * 事件任务触发器
      */
-    var EVENT_TASK_EXECUTOR: String? = null
+    var eventTaskExecutor: String? = null
 ) : WorkFlowComponentBase(id, name, componentType = Constant.COMPONENT_TYPE_NODE)
 
 /**
