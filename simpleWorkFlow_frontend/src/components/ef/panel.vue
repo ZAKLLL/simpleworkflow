@@ -620,13 +620,7 @@ export default {
           lineFromFromNode = line;
         }
       }
-      console.log("fromNode", fromNode);
-      console.log("lineFromFromNode", lineFromFromNode);
-
-            //       this.$message.error(
-            //   "流程节点仅允许有一个出度，及一个入度 (start_node 仅允许有一个出度,end_node 仅允许有一个入度)"
-            // );
-      //非网关，已经存在出路
+       //非网关，已经存在出路
       if (!fromNode.gateway) {
         if (lineFromFromNode != null) {
               this.$message.error(

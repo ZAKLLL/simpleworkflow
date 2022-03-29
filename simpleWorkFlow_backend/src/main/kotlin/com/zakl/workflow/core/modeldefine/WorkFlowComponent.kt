@@ -22,7 +22,6 @@ class WorkFlowNode constructor(
     id: String,
     name: String,
     var type: NodeType,
-    var pid: String?,
     var sId: String?,
     /**
      * 多人会签通过比例(默认为1)

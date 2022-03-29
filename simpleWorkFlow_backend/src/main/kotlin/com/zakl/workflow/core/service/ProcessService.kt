@@ -158,11 +158,6 @@ class ProcessServiceImpl : ProcessService {
             return
         }
 
-        nextNodes.any { i -> nodeRelService.checkIfHasParallel(curNode, i) }.run {
-            if (this) {
-                throw CustomException.neSlf4jStyle("不可将节点提交到并行网关之前!")
-            }
-        }
 
         for (nextNode in nextNodes) {
             val nextNodeIdentityIds =

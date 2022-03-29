@@ -7,9 +7,9 @@ import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_LINE
 import com.zakl.workflow.common.Constant.Companion.COMPONENT_TYPE_NODE
 import com.zakl.workflow.common.Constant.Companion.WHERE_IN_PLACEHOLDER_STR
 import com.zakl.workflow.core.entity.*
-import com.zakl.workflow.core.eval
 import com.zakl.workflow.core.modeldefine.*
 import com.zakl.workflow.exception.CustomException
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -30,7 +30,7 @@ private const val SERVICE_BEAN_NAME: String = "noderelservice";
 @Transactional
 class NodeRelService {
 
-    val log = LoggerFactory.getLogger(this.javaClass)
+    val log: Logger = LoggerFactory.getLogger(this.javaClass)
 
     @Autowired
     lateinit var modelComponentMapper: ModelComponentMapper
@@ -61,7 +61,7 @@ class NodeRelService {
         for (modelId in modeIdComponentsMap.keys) {
             val components = modeIdComponentsMap[modelId]!!
             initModelComponents(modelId, components)
-            log.info("加载 modelId{} 完毕",modelId)
+            log.info("加载 modelId{} 完毕", modelId)
         }
     }
 
@@ -195,36 +195,37 @@ class NodeRelService {
         return nodeMap[nodeId] ?: throw CustomException.neSlf4jStyle("nodeId:{} 不存在!", nodeId)
     }
 
-    /**
-     * 检查目标节点到当前节点是否存在并行网关
-     */
-    fun checkIfHasParallel(curNode: WorkFlowNode, targetNode: WorkFlowNode): Boolean {
-        //假设targetNode  为curNode 的历史路径出现的节点
-        //假设curNode  为targetNode 的历史路径出现的节点
-        return (existParallel(curNode, targetNode) || existParallel(targetNode, curNode))
-    }
+//    /**
+//     * 检查目标节点到当前节点是否存在并行网关
+//     */
+//    fun checkIfHasParallel(curNode: WorkFlowNode, targetNode: WorkFlowNode): Boolean {
+//        //假设targetNode  为curNode 的历史路径出现的节点
+//        //假设curNode  为targetNode 的历史路径出现的节点
+//        return (existParallel(curNode, targetNode) || existParallel(targetNode, curNode))
+//    }
 
-    private fun existParallel(curNode: WorkFlowNode, targetNode: WorkFlowNode): Boolean {
-        var curNode = curNode
-        var parallel = false
-        while (curNode.type != NodeType.START_NODE && curNode != targetNode) {
-            val lineId = curNode.pid
-            val pId = lineMap[lineId]!!.pId
-            if (nodeMap.containsKey(pId)) {
-                curNode = nodeMap[pId]!!
-                if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
-                    parallel = true
-                }
-            } else {
-                val gateWay = gatewayMap[pId]
-                if (gateWay!!.pids.size > 1) {
-                    parallel = true
-                }
-            }
-        }
-        if (curNode == targetNode) return parallel
-        return false
-    }
+//    private fun existParallel(curNode: WorkFlowNode, targetNode: WorkFlowNode): Boolean {
+//        return false
+//        var curNode = curNode
+//        var parallel = false
+//        while (curNode.type != NodeType.START_NODE && curNode != targetNode) {
+//            val lineId = curNode.pid
+//            val pId = lineMap[lineId]!!.pId
+//            if (nodeMap.containsKey(pId)) {
+//                curNode = nodeMap[pId]!!
+//                if (curNode.type == NodeType.MULTI_USER_TASK_NODE) {
+//                    parallel = true
+//                }
+//            } else {
+//                val gateWay = gatewayMap[pId]
+//                if (gateWay!!.pids.size > 1) {
+//                    parallel = true
+//                }
+//            }
+//        }
+//        if (curNode == targetNode) return parallel
+//        return false
+//    }
 
 
 }
