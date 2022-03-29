@@ -100,7 +100,7 @@
               plain
               round
               @click="deploy"
-              :disabled="(modelId != null && modelId.length > 0) ? false : true"
+              :disabled="modelId != null && modelId.length > 0 ? false : true"
               icon="el-icon-s-check"
               size="mini"
               >部署</el-button
@@ -181,7 +181,7 @@ import FlowHelp from "@/components/ef/help";
 import FlowNodeForm from "./node_form";
 import lodash from "lodash";
 import { ForceDirected } from "./force-directed";
-import { apiGetModels, apiSaveModel,apiDeploy } from "./request";
+import { apiGetModels, apiSaveModel, apiDeploy } from "./request";
 import { genBackEndData } from "./utils";
 
 export default {
@@ -358,6 +358,9 @@ export default {
           }
           if (this.hashOppositeLine(from, to)) {
             this.$message.error("不支持两个节点之间连线回环");
+            return false;
+          }
+          if (this.nodeLineCheck(from, to)) {
             return false;
           }
           this.$message.success("连接成功");
@@ -599,6 +602,57 @@ export default {
     hashOppositeLine(from, to) {
       return this.hasLine(to, from);
     },
+
+    nodeLineCheck(from, to) {
+      var fromNode = null;
+      var lineFromFromNode = null;
+      var toNode = null;
+      // var lineToToNode = null;
+      for (var node of this.data.nodeList) {
+        if (node.id == from) {
+          fromNode = node;
+        } else if (node.id == to) {
+          toNode = node;
+        }
+      }
+      for (var line of this.data.lineList) {
+        if (line.from == from) {
+          lineFromFromNode = line;
+        }
+      }
+      console.log("fromNode", fromNode);
+      console.log("lineFromFromNode", lineFromFromNode);
+
+            //       this.$message.error(
+            //   "流程节点仅允许有一个出度，及一个入度 (start_node 仅允许有一个出度,end_node 仅允许有一个入度)"
+            // );
+      //非网关，已经存在出路
+      if (!fromNode.gateway) {
+        if (lineFromFromNode != null) {
+              this.$message.error(
+              "流程节点仅允许有一个出度"
+            );
+          return true;
+        }
+        //结束节点不允许有出路
+        if (fromNode.type == "END_NODE") {
+          this.$message.error(
+              "结束节点不允许有出度"
+            );
+          return true;
+        }
+      }
+      //开始节点不准有入度
+      if (toNode.type == "START_NODE") {
+          this.$message.error(
+              "开始节点不允许有入度"
+            );
+        return true;
+      }
+
+      return false;
+    },
+
     nodeRightMenu(nodeId, evt) {
       this.menu.show = true;
       this.menu.curNodeId = nodeId;
@@ -694,16 +748,18 @@ export default {
     },
 
     deploy() {
-      apiDeploy(this.modelId).then(res=>{
-        var data = res.data;
-        if (data.status == "0") {
-          this.$message.success("部署成功");
-        } else {
-          this.$message.error(data.data);
-        }
-      }).catch(err=>{
+      apiDeploy(this.modelId)
+        .then((res) => {
+          var data = res.data;
+          if (data.status == "0") {
+            this.$message.success("部署成功");
+          } else {
+            this.$message.error(data.data);
+          }
+        })
+        .catch((err) => {
           this.$message.error("服务异常");
-      })
+        });
     },
     //保存流程模型到后端并更新下拉框
     saveModel() {
@@ -757,6 +813,5 @@ export default {
       return model;
     },
   },
-  
 };
 </script>
