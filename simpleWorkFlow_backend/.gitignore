@@ -1,7 +1,6 @@
-/target/*
-/.idea/*
-/.mvn/*
-/simpleWorkFlow_backend/target/*
-/simpleWorkFlow_backend/.idea/*
-/simpleWorkFlow_backend/.mvn/*
-/.idea/libraries/
+**/target/
+**/.idea/
+**/.mvn/
+**/simpleWorkFlow_backend/target/*
+**/simpleWorkFlow_backend/.idea/*
+**/simpleWorkFlow_backend/.mvn/*
