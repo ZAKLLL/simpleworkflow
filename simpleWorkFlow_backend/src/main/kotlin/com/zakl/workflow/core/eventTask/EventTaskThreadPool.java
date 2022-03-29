@@ -29,7 +29,7 @@ public class EventTaskThreadPool {
 
     private static int seq = 0;
 
-    private final static String THREAD_PREFIX = "SIMPLE_THREAD_POOL";
+    private final static String THREAD_PREFIX = "EVENT_TASK_THREAD_POOL";
 
     private final static LinkedList<Callable<EventTaskExecuteResult>> TASK_QUEUE = new LinkedList<>();
 
