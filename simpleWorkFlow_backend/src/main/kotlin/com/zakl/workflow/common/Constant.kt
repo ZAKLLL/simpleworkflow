@@ -48,6 +48,8 @@ class Constant {
 
         const val WHERE_IN_PLACEHOLDER_STR = "_！@#%@#……%！@@！@DASDqwedc2652548&_";
 
+        const val WHERE_IN_PLACEHOLDER_INT = Int.MIN_VALUE;
+
         const val RESULT_STATUS_SUCCESS = 0
         const val RESULT_STATUS_FAIL = 1
         const val RESULT_STATUS_ERROR = 2
