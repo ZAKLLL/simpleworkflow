@@ -8,6 +8,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
 
@@ -48,6 +49,13 @@ public class EventTaskThreadPool {
     public void beanInit() {
         processService = SpringContextBeanUtils.getBean(ProcessService.class);
         threadPoolInit();
+        //系统启动时,将数据库中的自动任务提交到线程池中进行处理
+        processService.getNotCompletedEventNodeTask().forEach(this::submit);
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        //todo 处理线程池关闭时的动作
     }
 
 
@@ -56,7 +64,7 @@ public class EventTaskThreadPool {
 
 
     public void submit(Callable<EventTaskExecuteResult> callable) {
-        log.info("接收到EventTaskThread :{}",callable.toString());
+        log.info("接收到EventTaskThread :{}", callable.toString());
         synchronized (TASK_QUEUE) {
             TASK_QUEUE.addLast(callable);
             TASK_QUEUE.notifyAll();
@@ -110,11 +118,11 @@ public class EventTaskThreadPool {
                     taskState = TaskState.RUNNING;
                     try {
                         EventTaskExecuteResult res = callable.call();
-                        log.info("EventTask:{} 任务处理完毕,即将执行自动审批动作",res.getIdentityTaskId());
+                        log.info("EventTask:{} 任务处理完毕,即将执行自动审批动作", res.getIdentityTaskId());
                         //自动审批任务进行完毕后执行自动审批动作
                         processService.completeIdentityTask(res.getIdentityTaskId(), res.getVariables(), res.getAssignValue());
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("EventTask 自动任务执行失败", e);
                     }
                     taskState = TaskState.FREE;
                 }

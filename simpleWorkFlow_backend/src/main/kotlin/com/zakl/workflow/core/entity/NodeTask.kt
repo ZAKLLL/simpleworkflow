@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.core.mapper.BaseMapper
 import com.zakl.workflow.common.BasePersistentObject
 import com.zakl.workflow.core.WorkFlowState
+import com.zakl.workflow.core.modeldefine.GatewayType
+import com.zakl.workflow.core.modeldefine.NodeType
 import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.annotations.Update
 import java.util.*
@@ -32,6 +34,11 @@ data class NodeTask(
      * identityId1;identityId2;IdentityId3
      */
     var curIdentityIds: String,
+
+    /**
+     * 节点类型
+     */
+    var nodeType: String
 
     ) : BasePersistentObject() {
     companion object {
@@ -74,7 +81,10 @@ data class NodeTask(
      */
     var variables: String = "{}"
 
-    constructor() : this("", "", 0, "") {
+
+
+
+    constructor() : this("", "", 0, "","") {
 
     }
 

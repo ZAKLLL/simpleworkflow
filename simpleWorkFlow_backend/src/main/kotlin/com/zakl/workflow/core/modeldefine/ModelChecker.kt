@@ -3,6 +3,10 @@ package com.zakl.workflow.core.modeldefine
 import cn.hutool.core.util.StrUtil
 import com.zakl.workflow.core.service.ModelInfo
 import com.zakl.workflow.exception.ModelDefineException
+import io.netty.util.internal.StringUtil
+import lombok.extern.slf4j.Slf4j
+import org.slf4j.LoggerFactory
+import java.util.logging.Logger
 import java.util.stream.Collectors
 
 /**
@@ -11,12 +15,14 @@ import java.util.stream.Collectors
  * @date 3/18/2022 4:31 PM
  * @author ZhangJiaKui
  */
+
 class ModelChecker private constructor(
     var nodeMap: Map<String, WorkFlowNode>,
     var lineMap: Map<String, WorkFlowLine>,
     var gatewayMap: Map<String, WorkFlowGateway>
 ) {
 
+    val log: org.slf4j.Logger = LoggerFactory.getLogger(this.javaClass)
 
     companion object {
         fun modelCheck(modelInfo: ModelInfo): Boolean {
@@ -122,11 +128,23 @@ class ModelChecker private constructor(
         when (node.type) {
             //end节点需要校验是否为
             NodeType.END_NODE -> {
-                toEndSet.addAll(vis)
+                toEndSet.addAll(HashSet(vis))
                 if (StrUtil.isNotEmpty(node.sId)) {
                     throw ModelDefineException("请检查 结束节点不应包含出路!")
                 }
                 return
+            }
+            NodeType.EVENT_TASK_NODE -> {
+                if (StrUtil.isBlank(node.eventTaskExecutor)) {
+                    throw ModelDefineException("请检查 任务节点必须配置任务执行器!")
+                }
+                try {
+                    //校验任务执行器是否存在,且需要具有无参构造器
+                    Class.forName(node.eventTaskExecutor).newInstance()
+                } catch (e: Exception) {
+                    log.error("任务节点${node.name} 任务执行器 ${node.eventTaskExecutor} 测试生成执行器实例失败!",e)
+                    throw ModelDefineException("请检查 任务节点${node.name} 任务执行器 ${node.eventTaskExecutor} 是否存在,且存在无参构造器!")
+                }
             }
             else -> {}
         }

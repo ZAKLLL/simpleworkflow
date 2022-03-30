@@ -3,6 +3,7 @@ package com.zakl.workflow.core.service
 import cn.hutool.core.util.StrUtil
 import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
+import com.zakl.workflow.common.Constant
 import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
 import com.zakl.workflow.common.Constant.Companion.EVENT_NODE_IDENTITYID
 import com.zakl.workflow.common.combineVariablesToStr
@@ -10,6 +11,7 @@ import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.core.eventTask.EventTaskExecute
+import com.zakl.workflow.core.eventTask.EventTaskExecuteResult
 import com.zakl.workflow.core.eventTask.EventTaskThreadPool
 import com.zakl.workflow.core.modeldefine.NodeType
 import com.zakl.workflow.core.modeldefine.WorkFlowNode
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import java.util.concurrent.Callable
+import kotlin.collections.HashMap
 
 private const val SERVICE_BEAN_NAME: String = "processService";
 
@@ -55,6 +59,12 @@ interface ProcessService {
      * 重启流程(关闭/撤回)
      */
     fun reOpenProcessInstance(processInstanceId: ReOpenProcessParam)
+
+
+    /**
+     * 获取因为系统运行终端而导致的部分未完成的任务节点
+     */
+    fun getNotCompletedEventNodeTask(): List<Callable<EventTaskExecuteResult>>
 
 }
 
@@ -121,6 +131,12 @@ class ProcessServiceImpl : ProcessService {
         val identityTask = identityTaskMapper.selectById(identityTaskId)
         if (identityTask.endTime != null) {
             throw ProcessException("identityTaskId $identityTaskId 任务节点已经被执行!");
+        } else if (identityTask.workFlowState != WorkFlowState.HANDLING.code) {
+            throw ProcessException(
+                "identityTaskId $identityTaskId 不可执行! 任务节点状态为: " + WorkFlowState.getApprovalStatus(
+                    identityTask.workFlowState
+                )
+            );
         }
         val curNode = nodeRelService.getNode(identityTask.nodeId)
         identityTask.also {
@@ -253,11 +269,13 @@ class ProcessServiceImpl : ProcessService {
     private fun distributeIdentityTask(
         processInstanceId: String, node: WorkFlowNode, assignIdentityIds: List<String>
     ): List<IdentityTask> {
+
         val nodeTask = NodeTask(
             processInstanceId = processInstanceId,
             nodeId = node.id,
             identityTaskCnt = assignIdentityIds.size,
-            curIdentityIds = assignIdentityIds.joinToString(";")
+            curIdentityIds = assignIdentityIds.joinToString(";"),
+            nodeType = node.type.name
         )
         nodeTaskMapper.insert(nodeTask)
 
@@ -285,7 +303,7 @@ class ProcessServiceImpl : ProcessService {
     /**
      * 提交eventNode 到threapool
      */
-    fun doEventNodeTaskSubmit(eventTaskNode: WorkFlowNode, identityTasks: ArrayList<IdentityTask>) {
+    private fun doEventNodeTaskSubmit(eventTaskNode: WorkFlowNode, identityTasks: ArrayList<IdentityTask>) {
         if (identityTasks.size != 1) {
             throw CustomException.neSlf4jStyle("EVENT_TASK_NODE should only has one identityTask!");
         }
@@ -299,5 +317,36 @@ class ProcessServiceImpl : ProcessService {
         eventTaskThreadPool.submit {
             eventTaskExecute.execute(identityTask.id!!, nodeTask.getVariablesMap())
         }
+    }
+
+    /**
+     * 获取因为系统运行终端而导致的部分未完成的任务节点
+     */
+    override fun getNotCompletedEventNodeTask(): List<Callable<EventTaskExecuteResult>> {
+        val nodeTaskIdMap: MutableMap<String, NodeTask> = HashMap()
+        val notCompleteEventNodeTaskIds = nodeTaskMapper.selectList(
+            QueryWrapper<NodeTask?>().eq("nodeType", NodeType.EVENT_TASK_NODE.name)
+                .eq("workFlowState", WorkFlowState.HANDLING)
+        ).also {
+            for (nodeTask in it) {
+                nodeTaskIdMap.put(nodeTask.id!!, nodeTask)
+            }
+        }.map { i -> i.nodeId }.toMutableList().also { if (it.isEmpty()){it.add(Constant.WHERE_IN_PLACEHOLDER_STR)} }
+        val identityTasks = identityTaskMapper.selectList(
+            QueryWrapper<IdentityTask?>().eq("workFlowState", WorkFlowState.HANDLING)
+                .`in`("nodeTaskId", notCompleteEventNodeTaskIds)
+        )
+        val ret = mutableListOf<Callable<EventTaskExecuteResult>>()
+        for (identityTask in identityTasks) {
+            val node = nodeRelService.getNode(identityTask.nodeId)
+            val eventTaskExecute = Class.forName(node.eventTaskExecutor).newInstance() as EventTaskExecute
+            ret.add {
+                eventTaskExecute.execute(
+                    identityTask.id!!,
+                    nodeTaskIdMap.get(identityTask.nodeTaskId)!!.getVariablesMap()
+                )
+            }
+        }
+        return ret
     }
 }
