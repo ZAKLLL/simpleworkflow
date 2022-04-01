@@ -620,27 +620,27 @@ export default {
           lineFromFromNode = line;
         }
       }
-       //非网关，已经存在出路
+      //非网关，已经存在出路
       if (!fromNode.gateway) {
         if (lineFromFromNode != null) {
-              this.$message.error(
-              "流程节点仅允许有一个出度"
-            );
+          this.$message.error("流程节点仅允许有一个出度");
           return true;
         }
         //结束节点不允许有出路
         if (fromNode.type == "END_NODE") {
-          this.$message.error(
-              "结束节点不允许有出度"
-            );
+          this.$message.error("结束节点不允许有出度");
           return true;
         }
       }
       //开始节点不准有入度
       if (toNode.type == "START_NODE") {
-          this.$message.error(
-              "开始节点不允许有入度"
-            );
+        this.$message.error("开始节点不允许有入度");
+        return true;
+      }
+
+      //开始节点不准直连到网关
+      if (fromNode.type == "START_NODE" && toNode.gateway) {
+        this.$message.error("开始节点不允许直连到网关");
         return true;
       }
 
