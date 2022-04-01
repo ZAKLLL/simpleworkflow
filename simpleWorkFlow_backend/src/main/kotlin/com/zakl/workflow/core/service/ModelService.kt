@@ -8,6 +8,7 @@ import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.modeldefine.ModelChecker
 import com.zakl.workflow.core.modeldefine.WorkFlowComponentBase
 import com.zakl.workflow.core.entity.*
+import com.zakl.workflow.core.modeldefine.WorkFlowNode
 import com.zakl.workflow.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -113,4 +114,6 @@ class ModelServiceImpl : ModelService {
         }
         return modelConfigMapper.selectPage(Page(page.toLong(), size.toLong()), queryWrapper)
     }
+
+
 }

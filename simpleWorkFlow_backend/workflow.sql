@@ -73,6 +73,7 @@ create table t_node_task
     updateTime timestamp default CURRENT_TIMESTAMP not null,
     status smallint default 1 not null,
     nodeType varchar(255) ,
+    parentNodeTaskId: varchar(64),
     constraint t_node_task_id_uindex
         unique (id)
 )

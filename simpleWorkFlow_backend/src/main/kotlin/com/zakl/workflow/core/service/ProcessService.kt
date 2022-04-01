@@ -5,7 +5,8 @@ import com.alibaba.fastjson.JSON
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper
 import com.zakl.workflow.common.Constant
 import com.zakl.workflow.common.Constant.Companion.APPROVAL_COMMENT
-import com.zakl.workflow.common.Constant.Companion.EVENT_NODE_IDENTITYID
+import com.zakl.workflow.common.Constant.Companion.END_NODE_IDENTITY_ID
+import com.zakl.workflow.common.Constant.Companion.EVENT_NODE_IDENTITY_ID
 import com.zakl.workflow.common.combineVariablesToStr
 import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.core.WorkFlowState
@@ -33,7 +34,12 @@ interface ProcessService {
     /**
      * 开启新流程
      */
-    fun startNewProcess(modelId: String, identityId: String, variables: Map<String, *>, assignValue: String)
+    fun startNewProcess(
+        modelId: String,
+        identityId: String,
+        variables: Map<String, *>,
+        assignValue: String
+    ): ProcessInstance
 
     /**
      * 查询所分配的任务
@@ -66,6 +72,17 @@ interface ProcessService {
      */
     fun getNotCompletedEventNodeTask(): List<Callable<EventTaskExecuteResult>>
 
+    /**
+     * 获取审批记录
+     * 最新一轮流程审批数据()
+     */
+    fun getProcessHistory(processInstanceId: String): List<IdentityTask>
+
+    /**
+     * 查询当前任务节点在当前的variables 能够到达的下个节点
+     */
+    fun getNextNodesByIdentityTaskId(identityTaskId: String, variables: Map<String, *>): List<WorkFlowNode>
+
 }
 
 @Service(value = SERVICE_BEAN_NAME)
@@ -94,7 +111,12 @@ class ProcessServiceImpl : ProcessService {
     /**
      * 开启新流程
      */
-    override fun startNewProcess(modelId: String, identityId: String, variables: Map<String, *>, assignValue: String) {
+    override fun startNewProcess(
+        modelId: String,
+        identityId: String,
+        variables: Map<String, *>,
+        assignValue: String
+    ): ProcessInstance {
         var model: ModelConfig =
             modelMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle("modelId:{}流程不存在", modelId)
 
@@ -106,10 +128,12 @@ class ProcessServiceImpl : ProcessService {
         val startNode = nodeRelService.getStartNode(modelId)
 
         //将开始节点作为任务分发给申请人
-        val curIdentityTask = distributeIdentityTask(processInstance.id!!, startNode, listOf(identityId))[0]
+        val curIdentityTask = distributeIdentityTask(processInstance.id!!, null, startNode, listOf(identityId))[0]
 
+        //自动审批开始节点,审批人为申请人
         completeIdentityTask(curIdentityTask.id!!, variables, assignValue)
 
+        return processInstance;
     }
 
     /**
@@ -160,52 +184,44 @@ class ProcessServiceImpl : ProcessService {
                 nodeTaskMapper.updateById(it)
             } else {
                 nodeTaskMapper.updateById(it)
-                //节点为多人会签节点，并且不满足结束条件,不进行节点跳转
+                //节点为多人会签节点，并且不满足结束条件,不进行下一个节点任务分发
                 return
             }
         }
 
-
-        val nextNodes = nodeRelService.getNextNodesByGateWay(curNode, variables);
         //校验当前分支结束
-        if (checkIfCurrentBranchCompleted(nextNodes)) {
+        if (curNode.type == NodeType.END_NODE) {
             //校验流程结束
             checkIfProcessInstanceCompleted(nodeTask);
             return
         }
 
-
+        val nextNodes = nodeRelService.getNextNodesByNode(curNode, variables);
         for (nextNode in nextNodes) {
             val nextNodeIdentityIds =
                 getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTask.nextAssignValue!!, nextNode.id)
+            //下个节点为任务节点
             if (nextNode.type == NodeType.EVENT_TASK_NODE) {
                 if (nextNodeIdentityIds.isNotEmpty()) {
-                    throw NodeIdentityAssignException("nextNode: $nextNode is Event_node_task,nextNodeIdentityIds shall be empty!")
-                } else {
-                    //EVENT_TASK_NODE 的identityId为固定的
-                    distributeIdentityTask(nodeTask.processInstanceId, nextNode, listOf(EVENT_NODE_IDENTITYID))
+                    throw NodeIdentityAssignException("nextNode: $nextNode is EVENT_NODE,任务节点不可配置 动态审批人!")
                 }
+                //EVENT_TASK_NODE 的identityId为固定的
+                nextNodeIdentityIds.add(EVENT_NODE_IDENTITY_ID)
+            }
+            //下个节点为结束节点
+            else if (nextNode.type == NodeType.END_NODE) {
+                if (nextNodeIdentityIds.isNotEmpty()) {
+                    throw NodeIdentityAssignException("nextNode: $nextNode is END_NODE,结束节点不可配置 审批人!")
+                }
+                nextNodeIdentityIds.add(END_NODE_IDENTITY_ID)
             } else {
                 if (nextNodeIdentityIds.isEmpty()) {
                     throw NodeIdentityAssignException("nextNode IdentityIds.isEmpty ! ,nextNode:$nextNode")
                 }
-                distributeIdentityTask(nodeTask.processInstanceId, nextNode, nextNodeIdentityIds)
             }
+            distributeIdentityTask(nodeTask.processInstanceId, nodeTask, nextNode, nextNodeIdentityIds)
         }
 
-    }
-
-
-    /**
-     *  校验是否当前分支是否结束
-     */
-    private fun checkIfCurrentBranchCompleted(
-        nextNodes: List<WorkFlowNode>
-    ): Boolean {
-        if (nextNodes.size == 1 && nextNodes[0].type == NodeType.END_NODE) {
-            return true
-        }
-        return false
     }
 
 
@@ -256,6 +272,7 @@ class ProcessServiceImpl : ProcessService {
         //将开始节点作为任务分发给申请人
         val curIdentityTask = distributeIdentityTask(
             reOpenProcessParam.processInstanceId,
+            null,
             startNode,
             listOf(processInstance.identityId)
         )[0]
@@ -267,15 +284,23 @@ class ProcessServiceImpl : ProcessService {
      * 分发指定节点任务到 identity
      */
     private fun distributeIdentityTask(
-        processInstanceId: String, node: WorkFlowNode, assignIdentityIds: List<String>
+        processInstanceId: String, preNodeTask: NodeTask?, targetNode: WorkFlowNode, assignIdentityIds: List<String>
     ): List<IdentityTask> {
+
+        if (targetNode.type != NodeType.MULTI_USER_TASK_NODE && assignIdentityIds.size != 1) {
+            throw CustomException.neSlf4jStyle(
+                "只有 多人会签节点支持 多个identity!当前 identitys信息{}",
+                assignIdentityIds.joinToString(";")
+            )
+        }
 
         val nodeTask = NodeTask(
             processInstanceId = processInstanceId,
-            nodeId = node.id,
+            nodeId = targetNode.id,
             identityTaskCnt = assignIdentityIds.size,
             curIdentityIds = assignIdentityIds.joinToString(";"),
-            nodeType = node.type.name
+            nodeType = targetNode.type.name,
+            parentNodeTaskId = preNodeTask?.id
         )
         nodeTaskMapper.insert(nodeTask)
 
@@ -284,7 +309,7 @@ class ProcessServiceImpl : ProcessService {
         assignIdentityIds.forEach { identityId ->
             val identityTask = IdentityTask(
                 processInstanceId = processInstanceId,
-                nodeId = node.id,
+                nodeId = targetNode.id,
                 nodeTaskId = nodeTask.id!!,
                 identityId = identityId
             )
@@ -292,8 +317,10 @@ class ProcessServiceImpl : ProcessService {
             identityTasks.add(identityTask)
         }
 
-        if (node.type == NodeType.EVENT_TASK_NODE) {
-            doEventNodeTaskSubmit(node, identityTasks);
+        if (targetNode.type == NodeType.EVENT_TASK_NODE) {
+            doEventNodeTaskSubmit(targetNode, identityTasks);
+        } else if (targetNode.type == NodeType.END_NODE) {
+            completeIdentityTask(identityTasks[0].id!!, mapOf<String, Any>(), null)
         }
 
         return identityTasks;
@@ -331,7 +358,11 @@ class ProcessServiceImpl : ProcessService {
             for (nodeTask in it) {
                 nodeTaskIdMap.put(nodeTask.id!!, nodeTask)
             }
-        }.map { i -> i.nodeId }.toMutableList().also { if (it.isEmpty()){it.add(Constant.WHERE_IN_PLACEHOLDER_STR)} }
+        }.map { i -> i.nodeId }.toMutableList().also {
+            if (it.isEmpty()) {
+                it.add(Constant.WHERE_IN_PLACEHOLDER_STR)
+            }
+        }
         val identityTasks = identityTaskMapper.selectList(
             QueryWrapper<IdentityTask?>().eq("workFlowState", WorkFlowState.HANDLING)
                 .`in`("nodeTaskId", notCompleteEventNodeTaskIds)
@@ -348,5 +379,22 @@ class ProcessServiceImpl : ProcessService {
             }
         }
         return ret
+    }
+
+    /**
+     * 获取审批记录
+     */
+    override fun getProcessHistory(processInstanceId: String): List<IdentityTask> {
+        return identityTaskMapper.selectList(QueryWrapper<IdentityTask?>().eq("processInstanceId", processInstanceId))
+    }
+
+    override fun getNextNodesByIdentityTaskId(identityTaskId: String, variables: Map<String, *>): List<WorkFlowNode> {
+        return identityTaskMapper.selectById(identityTaskId).also {
+            if (it == null) {
+                throw CustomException.neSlf4jStyle("identityTaskId:{} 无对应流程identityTask")
+            }
+        }.nodeId.run {
+            nodeRelService.getNextNodesByNodeId(this, variables)
+        }
     }
 }

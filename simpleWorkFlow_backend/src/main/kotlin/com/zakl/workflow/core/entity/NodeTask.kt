@@ -38,9 +38,14 @@ data class NodeTask(
     /**
      * 节点类型
      */
-    var nodeType: String
+    var nodeType: String,
 
-    ) : BasePersistentObject() {
+    /**
+     * 此节点任务的上一个节点任务id
+     */
+    var parentNodeTaskId: String?
+
+) : BasePersistentObject() {
     companion object {
         const val tableName = "t_node_task"
     }
@@ -82,9 +87,7 @@ data class NodeTask(
     var variables: String = "{}"
 
 
-
-
-    constructor() : this("", "", 0, "","") {
+    constructor() : this("", "", 0, "", "","") {
 
     }
 

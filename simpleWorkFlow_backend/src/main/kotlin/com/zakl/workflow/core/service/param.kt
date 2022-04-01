@@ -21,12 +21,15 @@ data class StartProcessParam(
 )
 
 data class ReOpenProcessParam(
-    var processInstanceId:String,
+    var processInstanceId: String,
     var variables: Map<String, *>,
     var assignValue: String
 )
 
-
+data class GetNextNodesParam(
+    var identityTaskId: String,
+    var variables: Map<String, *>
+)
 
 data class CompleteIdentityTaskParam(
     var identityTaskId: String,

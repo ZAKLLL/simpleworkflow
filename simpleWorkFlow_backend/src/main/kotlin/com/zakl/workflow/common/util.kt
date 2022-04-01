@@ -15,9 +15,11 @@ fun combineVariablesToStr(oleVariablesStr: String, newVariablesMap: Map<String, 
 /**
  * 获取节点中的指定节点的指定人
  */
-fun getTargetAssignIdentityIdsInNodeTaskAssignValue(nodeTaskNextAssignValue: String, nodeId: String): List<String> {
+fun getTargetAssignIdentityIdsInNodeTaskAssignValue(
+    nodeTaskNextAssignValue: String,
+    nodeId: String
+): MutableList<String> {
     return nodeTaskNextAssignValue.split(ASSIGN_IDENTITY_ID_SPLIT_SYMBOL)
         .filter { i -> i.startsWith(nodeId + ASSIGN_NODE_IDENTITY_LINK_SYMBOL) }
-        .map { i -> i.split(ASSIGN_NODE_IDENTITY_LINK_SYMBOL)[1] }
-
+        .map { i -> i.split(ASSIGN_NODE_IDENTITY_LINK_SYMBOL)[1] }.toMutableList()
 }

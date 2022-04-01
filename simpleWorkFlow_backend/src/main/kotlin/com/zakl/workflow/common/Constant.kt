@@ -39,7 +39,13 @@ class Constant {
         /**
          * 事件类型任务自动审批identityID
          */
-        const val EVENT_NODE_IDENTITYID = "EVENT_NODE_IDENTITYID"
+        const val EVENT_NODE_IDENTITY_ID = "EVENT_NODE_IDENTITY_ID"
+
+        /**
+         * 结束节点任务自动审批identityID
+         */
+        const val END_NODE_IDENTITY_ID = "END_NODE_IDENTITY_ID"
+
 
         /**
          * 审批评论

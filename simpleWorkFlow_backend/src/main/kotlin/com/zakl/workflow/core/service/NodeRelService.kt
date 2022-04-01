@@ -114,7 +114,7 @@ class NodeRelService {
     /**
      * 获取下一个节点
      */
-    fun getNextNodesByGateWay(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
+    fun getNextNodesByNode(curNode: WorkFlowNode, variables: Map<String, *>): List<WorkFlowNode> {
         val workFlowLine = lineMap[curNode.sId]!!
         //优先判定直达节点
         if (nodeMap.containsKey(workFlowLine.sId)) {
@@ -141,7 +141,15 @@ class NodeRelService {
     }
 
     /**
-     *
+     * 通过nodeid及 variables 查询下一个节点
+     */
+    fun getNextNodesByNodeId(curNodeId: String, variables: Map<String, *>): List<WorkFlowNode> {
+        return getNextNodesByNode(getNode(curNodeId), variables)
+    }
+
+
+    /**
+     * 通过网关查询下一个节点
      */
     fun getNextNodesByGateWay(gateway: WorkFlowGateway, variables: Map<String, *>): List<WorkFlowNode> {
 
@@ -195,6 +203,12 @@ class NodeRelService {
         return nodeMap[nodeId] ?: throw CustomException.neSlf4jStyle("nodeId:{} 不存在!", nodeId)
     }
 
+    /**
+     * 查询模型的第一个节点(非START_NODE)
+     */
+    fun getFirstModelNode(modelId: String): WorkFlowNode {
+        return getNextNodesByNode(getStartNode(modelId), mapOf<String, Any>())[0]
+    }
 //    /**
 //     * 检查目标节点到当前节点是否存在并行网关
 //     */
