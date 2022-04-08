@@ -146,3 +146,21 @@ simpleWorkflow为一个由kotlin+SpringBoot+mybatis-Plus 编写的轻量级工�
 3. 启动流程:/process/startNewProcess() 
 4. 通过步骤3中的identityId查询对应的identitytask:/process/getIdentityTasks
 5. 执行审批动作:/pocess/completedIdentityTask
+
+
+
+
+
+
+
+
+
+## 开发日志:
+
++ 04/08/2022
+
+  + 前端页面获取流程实例
+
+  + 前端页面支持获取审批记录
+
+    ![image-20220408151621373](image-20220408151621373.png)
