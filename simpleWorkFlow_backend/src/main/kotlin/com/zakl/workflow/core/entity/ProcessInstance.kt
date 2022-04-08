@@ -13,7 +13,6 @@ import java.util.*
 @TableName(value = ProcessInstance.tableName)
 data class ProcessInstance(
 
-
     /**
      * 模板id
      */
@@ -27,8 +26,12 @@ data class ProcessInstance(
     /**
      * 实例共享变量
      */
-    var variables: String
+    var variables: String,
 
+    /**
+     * 实例名称
+     */
+    var name: String
 ) : BasePersistentObject() {
     companion object {
         const val tableName = "t_process_instance"
@@ -58,7 +61,7 @@ data class ProcessInstance(
         return JSONObject.parseObject(variables, Map::class.java) as Map<String, *>
     }
 
-    constructor() : this("", "", "") {
+    constructor() : this("", "", "","") {
 
     }
 

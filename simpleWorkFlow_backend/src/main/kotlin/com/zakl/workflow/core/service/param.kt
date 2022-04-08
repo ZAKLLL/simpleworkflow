@@ -17,7 +17,8 @@ data class StartProcessParam(
     var modelId: String,
     var identityId: String,
     var variables: Map<String, *>,
-    var assignValue: String
+    var assignValue: String,
+    var name:String
 )
 
 data class ReOpenProcessParam(

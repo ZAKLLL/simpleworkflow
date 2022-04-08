@@ -35,10 +35,7 @@ interface ProcessService {
      * 开启新流程
      */
     fun startNewProcess(
-        modelId: String,
-        identityId: String,
-        variables: Map<String, *>,
-        assignValue: String
+        startProcessParam: StartProcessParam
     ): ProcessInstance
 
     /**
@@ -83,6 +80,12 @@ interface ProcessService {
      */
     fun getNextNodesByIdentityTaskId(identityTaskId: String, variables: Map<String, *>): List<WorkFlowNode>
 
+
+    /**
+     * 查询模型流程实例
+     */
+    fun getModelProcessInstances(modelId: String): List<ProcessInstance>
+
 }
 
 @Service(value = SERVICE_BEAN_NAME)
@@ -112,26 +115,31 @@ class ProcessServiceImpl : ProcessService {
      * 开启新流程
      */
     override fun startNewProcess(
-        modelId: String,
-        identityId: String,
-        variables: Map<String, *>,
-        assignValue: String
+        param: StartProcessParam
     ): ProcessInstance {
         var model: ModelConfig =
-            modelMapper.selectById(modelId) ?: throw CustomException.neSlf4jStyle("modelId:{}流程不存在", modelId)
+            modelMapper.selectById(param.modelId) ?: throw CustomException.neSlf4jStyle(
+                "modelId:{}流程不存在",
+                param.modelId
+            )
 
         val processInstance =
-            ProcessInstance(modelId = modelId, identityId = identityId, variables = JSON.toJSONString(variables));
+            ProcessInstance(
+                modelId = param.modelId,
+                identityId = param.identityId,
+                variables = JSON.toJSONString(param.variables),
+                name = param.name
+            );
         processInstanceMapper.insert(processInstance);
 
         //生成startNode 的任务
-        val startNode = nodeRelService.getStartNode(modelId)
+        val startNode = nodeRelService.getStartNode(param.modelId)
 
         //将开始节点作为任务分发给申请人
-        val curIdentityTask = distributeIdentityTask(processInstance.id!!, null, startNode, listOf(identityId))[0]
+        val curIdentityTask = distributeIdentityTask(processInstance.id!!, null, startNode, listOf(param.identityId))[0]
 
         //自动审批开始节点,审批人为申请人
-        completeIdentityTask(curIdentityTask.id!!, variables, assignValue)
+        completeIdentityTask(curIdentityTask.id!!, param.variables, param.assignValue)
 
         return processInstance;
     }
@@ -396,5 +404,12 @@ class ProcessServiceImpl : ProcessService {
         }.nodeId.run {
             nodeRelService.getNextNodesByNodeId(this, variables)
         }
+    }
+
+    /**
+     * 查询模型流程实例
+     */
+    override fun getModelProcessInstances(modelId: String): List<ProcessInstance> {
+        return processInstanceMapper.selectList(QueryWrapper<ProcessInstance?>().eq("modelId", modelId))
     }
 }

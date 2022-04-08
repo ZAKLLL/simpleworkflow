@@ -74,8 +74,7 @@ class ProcessController {
     @PostMapping("/startNewProcess")
     @ApiOperation("开启新流程")
     fun startNewProcess(@RequestBody startProcessParam: StartProcessParam): Result {
-        val (modelId, identityId, variables, assignValue) = startProcessParam
-        return ResultUtil.success(processService.startNewProcess(modelId, identityId, variables, assignValue))
+        return ResultUtil.success(processService.startNewProcess(startProcessParam))
     }
 
     @GetMapping("/identityTasks")
@@ -133,8 +132,14 @@ class ProcessController {
 
 
     @GetMapping("/getProcessHistory")
-    @ApiOperation("重启关闭的流程实例")
+    @ApiOperation("查询流程审批历史记录")
     fun getProcessHistory(processInstanceId: String): Result {
         return ResultUtil.success(processService.getProcessHistory(processInstanceId));
+    }
+
+    @GetMapping("/getModelProcessInstances")
+    @ApiOperation("查询模型实例")
+    fun getModelProcessInstances(modelId: String):Result{
+        return  ResultUtil.success(processService.getModelProcessInstances(modelId))
     }
 }
