@@ -1,5 +1,5 @@
 <template>
-  <div v-if="easyFlowVisible" style="height: calc(100vh)">
+  <div v-if="easyFlowVisible" style="height: calc(80vh)">
     <el-row>
       <!--顶部工具菜单-->
       <el-col :span="24">
@@ -56,11 +56,25 @@
 
             <el-select
               v-model="modelId"
-              placeholder="请选择流程"
+              placeholder="请选择流程模板"
               @change="dataReloadByModelId"
             >
               <el-option
                 v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
+
+            <el-select
+              v-model="processIntanceId"
+              placeholder="请选择流程实例查看实例信息"
+              @change="showInstanceHistory"
+            >
+              <el-option
+                v-for="item in processInstanceOptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
@@ -127,10 +141,12 @@
         </div>
       </el-col>
     </el-row>
+    <!--  //画布 -->
     <div style="display: flex; height: calc(100% - 47px)">
       <div style="width: 230px; border-right: 1px solid #dce3e8">
         <node-menu @addNode="addNode" ref="nodeMenu"></node-menu>
       </div>
+
       <div id="efContainer" ref="efContainer" class="container" v-flowDrag>
         <template v-for="node in data.nodeList">
           <flow-node
@@ -162,6 +178,23 @@
         ></flow-node-form>
       </div>
     </div>
+
+    <div style="display: flex; height: calc(30%)">
+      <el-table :data="instanceHistory" style="width: 100%" height="250">
+        <el-table-column prop="nodeId" label="节点id"> </el-table-column>
+        <el-table-column prop="nodeName" label="节点名称"> </el-table-column>
+        <el-table-column prop="identityId" label="责任人id"> </el-table-column>
+        <el-table-column prop="startTime" label="开始时间"> </el-table-column>
+        <el-table-column prop="endTime" label="结束时间"> </el-table-column>
+        <el-table-column prop="workFlowState" label="流程状态">
+        </el-table-column>
+        <el-table-column prop="nextAssignValue" label="后续节点审批人">
+        </el-table-column>
+        <el-table-column prop="variables" label="审批变量"> </el-table-column>
+        <el-table-column prop="comment" label="评论"> </el-table-column>
+      </el-table>
+    </div>
+
     <!-- 流程数据详情 -->
     <flow-info v-if="flowInfoVisible" ref="flowInfo" :data="data"></flow-info>
     <flow-help v-if="flowHelpVisible" ref="flowHelp"></flow-help>
@@ -181,7 +214,13 @@ import FlowHelp from "@/components/ef/help";
 import FlowNodeForm from "./node_form";
 import lodash from "lodash";
 import { ForceDirected } from "./force-directed";
-import { apiGetModels, apiSaveModel, apiDeploy } from "./request";
+import {
+  apiGetModels,
+  apiSaveModel,
+  apiDeploy,
+  apiGetModelInstances,
+  apiGetInstanceHistory,
+} from "./request";
 import { genBackEndData } from "./utils";
 
 export default {
@@ -198,6 +237,9 @@ export default {
       flowHelpVisible: false,
       // 数据
       data: {},
+      //流程实例历史记录
+      instanceHistory: [],
+
       // 激活的元素、可能是节点、可能是连线
       activeElement: {
         // 可选值 node 、line
@@ -211,6 +253,8 @@ export default {
       zoom: 0.5,
 
       options: [],
+      processInstanceOptions: [],
+      processIntanceId: "",
       modelId: "",
       models: {},
       addModelVisible: false,
@@ -280,19 +324,14 @@ export default {
     this.$nextTick(() => {
       // 默认加载models中的第一个流程
       this.getModels().then((models) => {
-        this.dataReload(models[0]);
+        // this.dataReload(models[0]);
         this.modelId = models[0].modelId;
 
-        // console.log(
-        //   "cccccc",
-        //   this.modelId,
-        //   "-",
-        //   this.modelId.length > 0 ? "true" : "false"
-        // );
         for (var model of models) {
           this.options.push({ value: model.modelId, label: model.name });
           this.models[model.modelId] = model;
         }
+        this.dataReloadByModelId();
       });
     });
   },
@@ -682,11 +721,26 @@ export default {
     },
 
     /**
-     * 根据下拉的数据加载流程图
+     * 根据下拉的数据加载流程
      */
     dataReloadByModelId() {
-      console.log("models", this.models);
       this.dataReload(this.models[this.modelId]);
+      //获取当前流程实例数据
+      this.getModelInstances(this.modelId)
+        .then((res) => {
+          this.processInstanceOptions = [];
+          this.processIntanceId = null;
+          for (var instance of res.data) {
+            this.processInstanceOptions.push({
+              value: instance.id,
+              label: instance.name,
+            });
+          }
+        })
+        .catch((err) => {
+          console.log("err", err);
+          this.$message.error("服务异常");
+        });
     },
 
     zoomAdd() {
@@ -783,9 +837,58 @@ export default {
         });
     },
 
+    showInstanceHistory() {
+      //todo 禁止拖动
+      this.getInstanceHistory(this.processIntanceId)
+        .then((res) => {
+          for (var instance of res.data) {
+            console.log("nodelist:", this.data.nodeList);
+            for (var node of this.data.nodeList) {
+              if (node.id == instance.nodeId) {
+                instance.nodeName = node.name;
+              }
+            }
+
+            switch (instance.workFlowState) {
+              case 0: {
+                instance.workFlowState = "未提交";
+                break;
+              }
+              case 1: {
+                instance.workFlowState = "审批中";
+                break;
+              }
+              case 2: {
+                instance.workFlowState = "已通过";
+                break;
+              }
+              case 3: {
+                instance.workFlowState = "已退回";
+                break;
+              }
+              case 9: {
+                instance.workFlowState = "关闭";
+                break;
+              }
+            }
+          }
+          this.instanceHistory = res.data;
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$message.error("服务异常",err);
+        });
+    },
+
     async getModels() {
       var models = [];
       var res = await apiGetModels();
+      if (res.data.status == "0") {
+        this.$message.success("查询流程模板成功");
+      } else {
+        this.$message.error("服务异常");
+        return;
+      }
       var modelConfigs = res.data.data.records;
       for (var item of modelConfigs) {
         var model = JSON.parse(item.tmpModel);
@@ -805,6 +908,28 @@ export default {
         this.$message.error(data.data);
       }
       return model;
+    },
+
+    async getModelInstances(modeId) {
+      var res = await apiGetModelInstances(modeId);
+      var data = res.data;
+      if (data.status == "0") {
+        this.$message.success("获取流程实例成功");
+      } else {
+        this.$message.error(data.data);
+      }
+      return data;
+    },
+
+    async getInstanceHistory(processIntanceId) {
+      var res = await apiGetInstanceHistory(processIntanceId);
+      var data = res.data;
+      if (data.status == "0") {
+        this.$message.success("获取实例审批记录成功");
+      } else {
+        this.$message.error(data.data);
+      }
+      return data;
     },
   },
 };

@@ -9,6 +9,9 @@
           label-width="80px"
           v-show="type === 'node'"
         >
+          <el-form-item label="nodeId">
+            <el-input v-model="node.id" :disabled="true"></el-input>
+          </el-form-item>
           <el-form-item label="类型">
             <el-input v-model="node.type" :disabled="true"></el-input>
           </el-form-item>
@@ -105,7 +108,7 @@ export default {
       node: {},
       line: {},
       data: {},
-      showLineForm:false,
+      showLineForm: false,
       stateList: [
         {
           state: "success",
@@ -150,7 +153,7 @@ export default {
           this.line["exclusiveOrder"] = i["exclusiveOrder"];
         }
       });
-      this.showLineForm=this.ifShowLineForm()
+      this.showLineForm = this.ifShowLineForm();
     },
     // 修改连线
     saveLine() {
@@ -203,7 +206,7 @@ export default {
           return node.type == "EXCLUSIVE_GATEWAY";
         }
       }
-      return false
+      return false;
     },
   },
 };

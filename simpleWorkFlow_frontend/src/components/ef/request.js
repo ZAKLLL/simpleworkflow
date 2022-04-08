@@ -13,28 +13,49 @@ export function apiSaveModel(modelInfo) {
   return service({
     url: 'model/insertOrUpdateModel',
     data: modelInfo,
-    method:'POST'
+    method: 'POST'
   })
 }
 
 export function apiGetModels() {
   return service({
     url: 'model/getModelConfigs',
-    params:{
-      page:0,
-      size:100,
+    params: {
+      page: 0,
+      size: 100,
     },
-    method:'GET'
+    method: 'GET'
   })
 }
 export function apiDeploy(modelId) {
   return service({
     url: 'model/deploy',
-    params:{
-      modelId:modelId
+    params: {
+      modelId: modelId
     },
-    method:'GET'
+    method: 'GET'
   })
 }
+
+export function apiGetModelInstances(modelId) {
+  return service({
+    url: 'process/getModelProcessInstances',
+    params: {
+      modelId: modelId
+    },
+    method: 'GET'
+  })
+}
+
+export function apiGetInstanceHistory(processInstanceId) {
+  return service({
+    url: 'process/getProcessHistory',
+    params: {
+      processInstanceId: processInstanceId
+    },
+    method: 'GET'
+  })
+}
+
 
 
