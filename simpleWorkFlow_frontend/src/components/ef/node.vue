@@ -32,7 +32,11 @@
       ></i>
       <i
         class="el-icon-warning-outline el-node-state-warning"
-        v-show="node.state === 'warning'"
+        v-show="node.state === 'closed'"
+      ></i>
+      <i
+        class="el-icon-warning-outline el-node-state-warning"
+        v-show="node.state === 'recalled'"
       ></i>
       <i
         class="el-icon-loading el-node-state-running"

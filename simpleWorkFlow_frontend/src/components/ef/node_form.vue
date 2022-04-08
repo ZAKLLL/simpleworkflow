@@ -49,7 +49,11 @@
           </el-form-item>
 
           <el-form-item label="状态">
-            <el-select v-model="node.state" placeholder="请选择">
+            <el-select
+              v-model="node.state"
+              placeholder="请选择"
+              :disabled="true"
+            >
               <el-option
                 v-for="item in stateList"
                 :key="item.state"
@@ -115,8 +119,12 @@ export default {
           label: "成功",
         },
         {
-          state: "warning",
-          label: "警告",
+          state: "closed",
+          label: "关闭",
+        },
+        {
+          state: "recalled",
+          label: "撤回",
         },
         {
           state: "error",

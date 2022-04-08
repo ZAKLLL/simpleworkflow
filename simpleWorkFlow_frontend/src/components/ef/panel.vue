@@ -220,6 +220,7 @@ import {
   apiDeploy,
   apiGetModelInstances,
   apiGetInstanceHistory,
+  apiGetInstanceNodeHistory,
 } from "./request";
 import { genBackEndData } from "./utils";
 
@@ -873,10 +874,52 @@ export default {
             }
           }
           this.instanceHistory = res.data;
+
+          this.tagNodeState();
         })
         .catch((err) => {
-          console.log(err)
-          this.$message.error("服务异常",err);
+          console.log(err);
+          this.$message.error("服务异常", err);
+        });
+    },
+
+    tagNodeState() {
+      //  this.data.nodeList
+      this.getInstanceNodeHistory(this.processIntanceId)
+        .then((res) => {
+          for (var nodeTask of res.data) {
+            for (var node of this.data.nodeList) {
+              if (nodeTask.nodeId == node.id) {
+                switch (nodeTask.workFlowState) {
+                  case 1: {
+                    node.state = "running";
+                    break;
+                  }
+                  case 2: {
+                    node.state = "success";
+                    break;
+                  }
+                  case 4: {
+                    node.state = "recalled";
+                    break;
+                  }
+                  case 9: {
+                    node.state = "closed";
+                    break;
+                  }
+                  case -1: {
+                    node.state = "error";
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          this.$message.error("服务异常", err);
         });
     },
 
@@ -926,6 +969,16 @@ export default {
       var data = res.data;
       if (data.status == "0") {
         this.$message.success("获取实例审批记录成功");
+      } else {
+        this.$message.error(data.data);
+      }
+      return data;
+    },
+    async getInstanceNodeHistory(processIntanceId) {
+      var res = await apiGetInstanceNodeHistory(processIntanceId);
+      var data = res.data;
+      if (data.status == "0") {
+        this.$message.success("获取实例节点审批记录成功");
       } else {
         this.$message.error(data.data);
       }

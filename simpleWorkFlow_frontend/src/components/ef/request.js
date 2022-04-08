@@ -56,6 +56,14 @@ export function apiGetInstanceHistory(processInstanceId) {
     method: 'GET'
   })
 }
-
+export function apiGetInstanceNodeHistory(processInstanceId) {
+  return service({
+    url: 'process/getProcessNodeHistory',
+    params: {
+      processInstanceId: processInstanceId
+    },
+    method: 'GET'
+  })
+}
 
 
