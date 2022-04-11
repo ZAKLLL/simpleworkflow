@@ -12,7 +12,6 @@ import com.zakl.workflow.common.getTargetAssignIdentityIdsInNodeTaskAssignValue
 import com.zakl.workflow.core.WorkFlowState
 import com.zakl.workflow.core.entity.*
 import com.zakl.workflow.core.eventTask.EventTaskExecute
-import com.zakl.workflow.core.eventTask.EventTaskExecuteResult
 import com.zakl.workflow.core.eventTask.EventTaskThreadPool
 import com.zakl.workflow.core.modeldefine.NodeType
 import com.zakl.workflow.core.modeldefine.WorkFlowNode
@@ -23,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import java.util.concurrent.Callable
-import kotlin.collections.HashMap
 
 private const val SERVICE_BEAN_NAME: String = "processService";
 
@@ -67,13 +64,19 @@ interface ProcessService {
     /**
      * 获取因为系统运行终端而导致的部分未完成的任务节点
      */
-    fun getNotCompletedEventNodeTask(): List<Callable<EventTaskExecuteResult>>
+    fun getNotCompletedEventNodeTask(): List<EventTaskThreadPool.EventNodeTaskRunnable>
 
     /**
-     * 获取审批记录
-     * 最新一轮流程审批数据()
+     * 获取identity审批记录
+     *
      */
-    fun getProcessHistory(processInstanceId: String): List<IdentityTask>
+    fun getProcessIdentityHistory(processInstanceId: String): List<IdentityTask>
+
+    /**
+     * 获取节点审批记录
+     *  最新一轮
+     */
+    fun getProcessNodeHistory(processInstanceId: String): List<NodeTask>
 
     /**
      * 查询当前任务节点在当前的variables 能够到达的下个节点
@@ -85,6 +88,11 @@ interface ProcessService {
      * 查询模型流程实例
      */
     fun getModelProcessInstances(modelId: String): List<ProcessInstance>
+
+    /**
+     * 标记EventTask任务错误执行
+     */
+    fun tagErrorEventTask(identityTaskId: String);
 
 }
 
@@ -163,7 +171,9 @@ class ProcessServiceImpl : ProcessService {
         val identityTask = identityTaskMapper.selectById(identityTaskId)
         if (identityTask.endTime != null) {
             throw ProcessException("identityTaskId $identityTaskId 任务节点已经被执行!");
-        } else if (identityTask.workFlowState != WorkFlowState.HANDLING.code) {
+        }
+        //错误节点可以重复执行
+        else if (identityTask.workFlowState != WorkFlowState.HANDLING.code || identityTask.workFlowState != WorkFlowState.ERROR.code) {
             throw ProcessException(
                 "identityTaskId $identityTaskId 不可执行! 任务节点状态为: " + WorkFlowState.getApprovalStatus(
                     identityTask.workFlowState
@@ -349,15 +359,19 @@ class ProcessServiceImpl : ProcessService {
         }
 
         val eventTaskExecute = Class.forName(eventTaskNode.eventTaskExecutor).newInstance() as EventTaskExecute
-        eventTaskThreadPool.submit {
-            eventTaskExecute.execute(identityTask.id!!, nodeTask.getVariablesMap())
-        }
+        eventTaskThreadPool.submit(
+            EventTaskThreadPool.EventNodeTaskRunnable(
+                identityTask.id!!,
+                nodeTask.getVariablesMap(),
+                eventTaskExecute
+            )
+        )
     }
 
     /**
      * 获取因为系统运行终端而导致的部分未完成的任务节点
      */
-    override fun getNotCompletedEventNodeTask(): List<Callable<EventTaskExecuteResult>> {
+    override fun getNotCompletedEventNodeTask(): List<EventTaskThreadPool.EventNodeTaskRunnable> {
         val nodeTaskIdMap: MutableMap<String, NodeTask> = HashMap()
         val notCompleteEventNodeTaskIds = nodeTaskMapper.selectList(
             QueryWrapper<NodeTask?>().eq("nodeType", NodeType.EVENT_TASK_NODE.name)
@@ -375,16 +389,17 @@ class ProcessServiceImpl : ProcessService {
             QueryWrapper<IdentityTask?>().eq("workFlowState", WorkFlowState.HANDLING)
                 .`in`("nodeTaskId", notCompleteEventNodeTaskIds)
         )
-        val ret = mutableListOf<Callable<EventTaskExecuteResult>>()
+        val ret = mutableListOf<EventTaskThreadPool.EventNodeTaskRunnable>()
         for (identityTask in identityTasks) {
             val node = nodeRelService.getNode(identityTask.nodeId)
             val eventTaskExecute = Class.forName(node.eventTaskExecutor).newInstance() as EventTaskExecute
-            ret.add {
-                eventTaskExecute.execute(
+            ret.add(
+                EventTaskThreadPool.EventNodeTaskRunnable(
                     identityTask.id!!,
-                    nodeTaskIdMap.get(identityTask.nodeTaskId)!!.getVariablesMap()
+                    nodeTaskIdMap.get(identityTask.nodeTaskId)!!.getVariablesMap(),
+                    eventTaskExecute
                 )
-            }
+            )
         }
         return ret
     }
@@ -392,7 +407,7 @@ class ProcessServiceImpl : ProcessService {
     /**
      * 获取审批记录
      */
-    override fun getProcessHistory(processInstanceId: String): List<IdentityTask> {
+    override fun getProcessIdentityHistory(processInstanceId: String): List<IdentityTask> {
         return identityTaskMapper.selectList(QueryWrapper<IdentityTask?>().eq("processInstanceId", processInstanceId))
     }
 
@@ -411,5 +426,31 @@ class ProcessServiceImpl : ProcessService {
      */
     override fun getModelProcessInstances(modelId: String): List<ProcessInstance> {
         return processInstanceMapper.selectList(QueryWrapper<ProcessInstance?>().eq("modelId", modelId))
+    }
+
+    /**
+     * 获取节点审批记录
+     *  最新一轮
+     */
+    override fun getProcessNodeHistory(processInstanceId: String): List<NodeTask> {
+        val nodeIdMap = mutableMapOf<String, NodeTask>()
+        nodeTaskMapper.selectList(QueryWrapper<NodeTask?>().eq("processInstanceId", processInstanceId)).run {
+            //升序排序
+            this.sortBy { it.startTime }
+            for (nodeTask in this) {
+                nodeIdMap[nodeTask.id!!] = nodeTask
+            }
+        }
+        return nodeIdMap.values.toList();
+    }
+
+    /**
+     * 标记EventTask任务错误执行
+     */
+    override fun tagErrorEventTask(identityTaskId: String) {
+        val errNodeTask =
+            identityTaskMapper.selectById(identityTaskId).run { nodeTaskMapper.selectById(this.nodeTaskId) }
+        errNodeTask.workFlowState = WorkFlowState.ERROR.code
+        nodeTaskMapper.updateById(errNodeTask);
     }
 }

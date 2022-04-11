@@ -132,14 +132,23 @@ class ProcessController {
 
 
     @GetMapping("/getProcessHistory")
-    @ApiOperation("查询流程审批历史记录")
+    @ApiOperation("查询流程identity审批历史记录")
     fun getProcessHistory(processInstanceId: String): Result {
-        return ResultUtil.success(processService.getProcessHistory(processInstanceId));
+        return ResultUtil.success(processService.getProcessIdentityHistory(processInstanceId));
     }
+
+    @GetMapping("/getProcessNodeHistory")
+    @ApiOperation("查询流程节点审批历史记录")
+    fun getProcessNodeHistory(processInstanceId: String): Result {
+        return ResultUtil.success(processService.getProcessNodeHistory(processInstanceId));
+    }
+
 
     @GetMapping("/getModelProcessInstances")
     @ApiOperation("查询模型实例")
     fun getModelProcessInstances(modelId: String):Result{
         return  ResultUtil.success(processService.getModelProcessInstances(modelId))
     }
+
+
 }

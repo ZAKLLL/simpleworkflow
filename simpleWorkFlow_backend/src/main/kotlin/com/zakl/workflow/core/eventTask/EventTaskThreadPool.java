@@ -2,6 +2,7 @@ package com.zakl.workflow.core.eventTask;
 
 import com.zakl.workflow.common.SpringContextBeanUtils;
 import com.zakl.workflow.core.service.ProcessService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import static com.zakl.workflow.core.eventTask.EventTaskThreadPool.COMPONENT_BEAN_NAME;
@@ -35,7 +37,7 @@ public class EventTaskThreadPool {
 
     private final static String THREAD_PREFIX = "EVENT_TASK_THREAD_POOL";
 
-    private final static LinkedList<Callable<EventTaskExecuteResult>> TASK_QUEUE = new LinkedList<>();
+    private final static LinkedList<EventNodeTaskRunnable> TASK_QUEUE = new LinkedList<>();
 
     private final static ThreadGroup group = new ThreadGroup("Pool_Group");
 
@@ -63,10 +65,10 @@ public class EventTaskThreadPool {
     }
 
 
-    public void submit(Callable<EventTaskExecuteResult> callable) {
-        log.info("接收到EventTaskThread :{}", callable.toString());
+    public void submit(EventNodeTaskRunnable runnable) {
+        log.info("接收到EventTaskThread :{}", runnable.toString());
         synchronized (TASK_QUEUE) {
-            TASK_QUEUE.addLast(callable);
+            TASK_QUEUE.addLast(runnable);
             TASK_QUEUE.notifyAll();
         }
     }
@@ -102,7 +104,7 @@ public class EventTaskThreadPool {
         public void run() {
             OUTER:
             while (this.taskState != TaskState.DEAD) {
-                Callable<EventTaskExecuteResult> callable;
+                EventNodeTaskRunnable executor;
                 synchronized (TASK_QUEUE) {
                     while (TASK_QUEUE.isEmpty()) {
                         try {
@@ -112,16 +114,17 @@ public class EventTaskThreadPool {
                             break OUTER;
                         }
                     }
-                    callable = TASK_QUEUE.removeFirst(); //取出任务队列的第一个线程任务
+                    executor = TASK_QUEUE.removeFirst(); //取出任务队列的第一个线程任务
                 }
-                if (callable != null) {
+                if (executor != null) {
                     taskState = TaskState.RUNNING;
                     try {
-                        EventTaskExecuteResult res = callable.call();
-                        log.info("EventTask:{} 任务处理完毕,即将执行自动审批动作", res.getIdentityTaskId());
+                        executor.run();
+                        log.info("EventTask:{} 任务处理完毕,即将执行自动审批动作", executor.getIdentityTaskId());
                         //自动审批任务进行完毕后执行自动审批动作
-                        processService.completeIdentityTask(res.getIdentityTaskId(), res.getVariables(), res.getAssignValue());
+                        processService.completeIdentityTask(executor.getIdentityTaskId(), executor.getVariables(), executor.nextNodeAssign);
                     } catch (Exception e) {
+                        processService.tagErrorEventTask(executor.getIdentityTaskId());
                         log.error("EventTask 自动任务执行失败", e);
                     }
                     taskState = TaskState.FREE;
@@ -134,4 +137,36 @@ public class EventTaskThreadPool {
         }
     }
 
+
+    public static class EventNodeTaskRunnable implements Runnable {
+        private final String identityTaskId;
+        private final Map<String, Object> variables;
+        private final EventTaskExecute execute;
+
+        private String nextNodeAssign;
+
+        public EventNodeTaskRunnable(String identityTaskId, Map<String, Object> variables, EventTaskExecute execute) {
+            this.identityTaskId = identityTaskId;
+            this.variables = variables;
+            this.execute = execute;
+        }
+
+        @Override
+        public void run() {
+            execute.execute(variables);
+            nextNodeAssign = execute.getNextAssigns();
+        }
+
+        public String getIdentityTaskId() {
+            return identityTaskId;
+        }
+
+        public Map<String, Object> getVariables() {
+            return variables;
+        }
+
+        public EventTaskExecute getExecute() {
+            return execute;
+        }
+    }
 }

@@ -22,7 +22,13 @@ enum class WorkFlowState(val code: Int) {
     RECALL(4),
 
     //关闭
-    CLOSED(9);
+    CLOSED(9),
+
+
+    //錯誤(自动任务执行错误)
+    ERROR(-1);
+
+
 
     companion object {
         fun getApprovalStatus(code: Int): WorkFlowState {
